@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Mail, ArrowLeft, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AdminLoginProps {
@@ -42,110 +42,84 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
         onLoginSuccess();
       }
     } catch {
-      setError('An unexpected login error occurred. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full">
-        {/* Back button */}
+    <div className="min-h-[70vh] flex items-center justify-center px-4 py-8">
+      <div className="max-w-sm w-full">
         <button
           onClick={onBackToSite}
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-neutral-500 hover:text-neutral-300 mb-5 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to public website</span>
+          <span>return to site</span>
         </button>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
-            <Lock className="w-5 h-5" />
-          </div>
-
-          <h1 className="text-xl font-bold text-white tracking-tight">
-            Administrator Access
+        <div className="bg-[#121212] border border-neutral-800 rounded-xl p-5 sm:p-6 shadow-xl">
+          <h1 className="text-lg font-bold text-neutral-100">
+            Admin Login
           </h1>
-          <p className="text-xs text-zinc-400 mt-1 mb-6">
-            Sign in with your Supabase admin credentials to verify transactions and manage campaign settings.
+          <p className="text-xs text-neutral-400 mt-0.5 mb-5">
+            Authenticate to review pending transactions.
           </p>
 
           {!isSupabaseConfigured && (
-            <div className="mb-5 p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-xs text-blue-300">
-              <span className="font-semibold block mb-0.5">ℹ️ Preview Environment:</span>
-              Supabase credentials not yet detected in `.env`. You can test the admin dashboard by typing any password!
+            <div className="mb-4 p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-neutral-400">
+              <span className="text-neutral-200 font-mono block">Preview Mode:</span>
+              Enter any password to access demo dashboard.
             </div>
           )}
 
           {error && (
-            <div className="mb-5 p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-xs text-red-300 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-              <span>{error}</span>
+            <div className="mb-4 p-2.5 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300">
+              {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Admin Email
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  required={isSupabaseConfigured}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 transition-colors"
-                />
-                <Mail className="w-4 h-4 text-zinc-500 absolute left-3 top-3 pointer-events-none" />
-              </div>
+              <label className="block text-neutral-400 mb-1 font-mono">Email</label>
+              <input
+                type="email"
+                required={isSupabaseConfigured}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 font-mono"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 transition-colors font-mono"
-                />
-                <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3 pointer-events-none" />
-              </div>
+              <label className="block text-neutral-400 mb-1 font-mono">Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 font-mono"
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-sm font-medium text-white transition-all flex items-center justify-center gap-2 shadow-sm mt-2"
+              className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors flex items-center justify-center gap-1.5 mt-1"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Authenticating...</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Signing in...</span>
                 </>
               ) : (
-                <span>Log In</span>
+                <span>Sign In</span>
               )}
             </button>
           </form>
-
-          <div className="mt-6 pt-5 border-t border-zinc-800/80 text-[11px] text-zinc-500 space-y-1">
-            <span className="flex items-center gap-1 text-zinc-400 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              Supabase Row-Level Security Enforced
-            </span>
-            <p>
-              Private references and pending donations are strictly restricted to authenticated administrator sessions.
-            </p>
-          </div>
         </div>
       </div>
     </div>

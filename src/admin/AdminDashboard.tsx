@@ -8,7 +8,6 @@ import {
   Clock,
   Settings,
   History,
-  TrendingUp,
   HelpCircle,
   Loader2,
   RefreshCw
@@ -61,7 +60,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
-  // Load data
   const loadData = async () => {
     setLoading(true);
     try {
@@ -108,7 +106,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleReject = async (id: string) => {
-    if (!window.confirm('Are you sure you want to reject this payment submission?')) return;
+    if (!window.confirm('Reject this submission?')) return;
     setActionLoadingId(id);
     try {
       const res = await rejectDonationAction(id);
@@ -160,26 +158,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   return (
-    <div className="py-8 animate-fade-in">
-      {/* Top Admin Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
+    <div className="py-6 sm:py-8 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-neutral-800">
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToSite}
-            className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
             title="Return to site"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-bold text-neutral-100 flex items-center gap-2">
               <span>Admin Dashboard</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-normal">
-                Verifications
+              <span className="text-[11px] font-mono text-neutral-500 font-normal">
+                ({pendingList.length} pending)
               </span>
             </h1>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Review incoming transactions, lock historical exchange rates, and manage campaign milestones.
+            <p className="text-xs text-neutral-500">
+              Manual verification & locked historical conversion
             </p>
           </div>
         </div>
@@ -187,70 +185,65 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={loadData}
-            className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-colors"
-            title="Refresh records"
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
+            title="Refresh"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={handleLogoutClick}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-950/20 hover:border-red-800/40 transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-400 hover:text-red-400 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <span>sign out</span>
           </button>
         </div>
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 mt-6 mb-6 overflow-x-auto pb-1 text-xs font-medium">
+      {/* Navigation tabs */}
+      <div className="flex items-center gap-2 mt-5 mb-5 overflow-x-auto pb-1 text-xs font-mono">
         <button
           onClick={() => setActiveTab('pending')}
-          className={`px-3.5 py-2 rounded-xl transition-colors flex items-center gap-2 shrink-0 ${
+          className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
             activeTab === 'pending'
-              ? 'bg-blue-600 text-white'
-              : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              ? 'bg-neutral-800 text-white'
+              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
-          <span>Pending Verifications</span>
-          {pendingList.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-white text-blue-600 text-[10px] font-bold flex items-center justify-center">
-              {pendingList.length}
-            </span>
-          )}
+          <span>Pending ({pendingList.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('campaign')}
-          className={`px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 shrink-0 ${
+          className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
             activeTab === 'campaign'
-              ? 'bg-blue-600 text-white'
-              : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              ? 'bg-neutral-800 text-white'
+              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
           }`}
         >
           <Settings className="w-3.5 h-3.5" />
-          <span>Campaign Status</span>
+          <span>Settings</span>
         </button>
 
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 shrink-0 ${
+          className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
             activeTab === 'history'
-              ? 'bg-blue-600 text-white'
-              : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              ? 'bg-neutral-800 text-white'
+              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
           }`}
         >
           <History className="w-3.5 h-3.5" />
-          <span>Audit History ({approvedList.length + rejectedList.length})</span>
+          <span>History ({approvedList.length + rejectedList.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('setup')}
-          className={`px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 shrink-0 ${
+          className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
             activeTab === 'setup'
-              ? 'bg-blue-600 text-white'
-              : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              ? 'bg-neutral-800 text-white'
+              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
           }`}
         >
           <HelpCircle className="w-3.5 h-3.5" />
@@ -259,150 +252,128 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* ========================================================= */}
-      {/* TAB 1: PENDING VERIFICATIONS                              */}
+      {/* PENDING TAB                                               */}
       {/* ========================================================= */}
       {activeTab === 'pending' && (
-        <div className="space-y-6">
-          {/* Exchange Rate Helper Bar */}
-          <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="space-y-4">
+          {/* Rate Controller */}
+          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+            <span className="text-neutral-400">
+              Lock Rate at Approval:
+            </span>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-blue-400 shrink-0" />
-              <div>
-                <span className="text-zinc-300 font-medium">Exchange Rate Lock: </span>
-                <span className="text-zinc-500">
-                  Approved donations lock this conversion rate permanently.
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label htmlFor="customRate" className="text-zinc-400 font-mono">1 USD = ₹</label>
+              <label htmlFor="customRate" className="text-neutral-500">1 USD = ₹</label>
               <input
                 id="customRate"
                 type="number"
                 step="0.01"
                 value={customRate}
                 onChange={(e) => setCustomRate(e.target.value)}
-                className="w-20 bg-zinc-950 border border-zinc-700 rounded-lg px-2 py-1 text-white font-mono text-xs focus:outline-none focus:border-blue-500"
+                className="w-20 bg-neutral-950 border border-neutral-700 rounded px-2 py-0.5 text-white font-mono text-xs focus:outline-none"
               />
-              <span className="text-zinc-500 text-[10px]">(Live: {currentFxRate.toFixed(2)})</span>
+              <span className="text-neutral-600 text-[11px]">(Live: {currentFxRate.toFixed(2)})</span>
             </div>
           </div>
 
           {loading ? (
-            <div className="py-12 text-center text-zinc-500 text-sm flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Loading pending verification requests...</span>
+            <div className="py-8 text-center text-neutral-500 text-xs font-mono flex items-center justify-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Loading pending submissions...</span>
             </div>
           ) : pendingList.length === 0 ? (
-            <div className="p-12 text-center rounded-2xl bg-zinc-900/30 border border-zinc-800">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-3">
-                <Check className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-zinc-200">No pending transactions</h3>
-              <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
-                All submitted payments have been verified. Any new submissions from supporters will appear here immediately.
-              </p>
+            <div className="p-8 text-center rounded-xl bg-neutral-900/30 border border-neutral-800 text-neutral-500 text-xs font-mono">
+              ✓ No pending submissions
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {pendingList.map((item) => {
                 const isUpi = item.payment_method === 'upi';
-                const nativeSymbol = item.native_currency === 'INR' ? '₹' : item.native_currency === 'USD' ? '$' : item.native_currency + ' ';
                 const rateNum = parseFloat(customRate) || currentFxRate;
                 
-                // Preview locked conversion
-                const previewConverted = item.native_currency === 'INR'
-                  ? `~$${(item.native_amount / rateNum).toFixed(2)} USD`
-                  : `~₹${Math.round(item.native_amount * rateNum).toLocaleString('en-IN')} INR`;
+                // USD is main everywhere; bracketed native/INR
+                const usdEst = item.native_currency === 'INR'
+                  ? (item.native_amount / rateNum).toFixed(2)
+                  : item.native_amount;
+                
+                const bracketText = item.native_currency === 'INR'
+                  ? `(₹${item.native_amount.toLocaleString('en-IN')})`
+                  : `(≈ ₹${Math.round(item.native_amount * rateNum).toLocaleString('en-IN')})`;
 
                 return (
                   <div
                     key={item.id}
-                    className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-700 transition-colors shadow-sm"
+                    className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 transition-colors"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      {/* Left: Donation Info */}
-                      <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-medium ${
-                              isUpi
-                                ? 'bg-blue-950/50 text-blue-400 border border-blue-500/25'
-                                : 'bg-purple-950/50 text-purple-400 border border-purple-500/25'
-                            }`}
-                          >
-                            {isUpi ? 'UPI Transfer' : 'International Gateway'}
+                          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-neutral-800 text-neutral-400">
+                            {isUpi ? 'UPI' : 'Card'}
                           </span>
-                          <span className="text-sm font-bold font-mono text-white">
-                            {nativeSymbol}{item.native_amount.toLocaleString()}
+                          <span className="text-sm font-bold font-mono text-neutral-100">
+                            ${usdEst}
                           </span>
-                          <span className="text-xs text-zinc-500 font-mono">
-                            ({previewConverted})
+                          <span className="text-xs font-mono text-neutral-500">
+                            {bracketText}
                           </span>
                         </div>
 
-                        {/* Transaction Reference Number (Prominent for Verification) */}
-                        <div className="flex items-center gap-2 bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800 max-w-fit">
-                          <span className="text-[10px] uppercase font-mono text-zinc-500">Ref / UTR:</span>
-                          <span className="text-xs font-mono font-bold text-zinc-100 select-all">
+                        {/* Reference / UTR */}
+                        <div className="flex items-center gap-1.5 text-xs font-mono bg-neutral-950 px-2.5 py-1 rounded border border-neutral-800/80 max-w-fit">
+                          <span className="text-neutral-500 uppercase text-[10px]">Ref:</span>
+                          <span className="text-neutral-200 font-semibold select-all">
                             {item.payment_reference}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleCopy(item.payment_reference)}
-                            className="text-zinc-500 hover:text-white p-0.5"
-                            title="Copy Reference"
+                            className="text-neutral-500 hover:text-white ml-1"
+                            title="Copy Ref"
                           >
                             {copiedRef === item.payment_reference ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3 h-3 text-emerald-400" />
                             ) : (
-                              <Copy className="w-3.5 h-3.5" />
+                              <Copy className="w-3 h-3" />
                             )}
                           </button>
                         </div>
 
-                        {/* Donor metadata */}
-                        <div className="text-xs text-zinc-400 flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <span>
-                            Donor: <strong className="text-zinc-200">{item.display_name || 'Anonymous'}</strong>
-                            {!item.show_name && <span className="text-zinc-500 ml-1">(Requested Anonymous)</span>}
-                          </span>
-                          <span className="text-zinc-600">•</span>
-                          <span>Submitted: {new Date(item.created_at).toLocaleString()}</span>
+                        <div className="text-[11px] text-neutral-400 font-mono">
+                          Backer: <strong className="text-neutral-200">{item.display_name || 'Anonymous'}</strong>
+                          {!item.show_name && <span className="text-neutral-600 ml-1">(Requested anon)</span>}
+                          <span className="text-neutral-600 ml-2">• {new Date(item.created_at).toLocaleString()}</span>
                         </div>
 
                         {item.message && (
-                          <div className="text-xs text-zinc-400 italic bg-zinc-800/40 px-3 py-1.5 rounded-lg border border-zinc-800 max-w-xl">
+                          <div className="text-xs text-neutral-400 italic">
                             "{item.message}"
                           </div>
                         )}
                       </div>
 
-                      {/* Right: Approve & Reject Actions */}
-                      <div className="flex items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-zinc-800">
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
                         <button
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleApprove(item)}
-                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-xs font-medium text-white transition-colors flex items-center gap-1.5 shadow-sm"
+                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors flex items-center gap-1"
                         >
                           {actionLoadingId === item.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <Loader2 className="w-3 h-3 animate-spin" />
                           ) : (
-                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            <Check className="w-3 h-3" />
                           )}
-                          <span>Approve & Lock Rate</span>
+                          <span>Approve & Lock</span>
                         </button>
 
                         <button
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleReject(item.id)}
-                          className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-red-950/40 text-xs font-medium text-zinc-400 hover:text-red-300 hover:border-red-800/40 border border-zinc-700 transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-mono text-neutral-400 hover:text-red-400 transition-colors"
                         >
-                          <X className="w-3.5 h-3.5" />
-                          <span>Reject</span>
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
@@ -415,297 +386,192 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* ========================================================= */}
-      {/* TAB 2: CAMPAIGN STATUS & SETTINGS                         */}
+      {/* CAMPAIGN SETTINGS TAB                                     */}
       {/* ========================================================= */}
       {activeTab === 'campaign' && (
-        <div className="max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-7">
-          <h2 className="text-base font-bold text-white mb-1">Campaign Configuration</h2>
-          <p className="text-xs text-zinc-400 mb-6">
-            Control crowdfunding lifecycle, toggle contribution intake, and record purchase status.
-          </p>
+        <div className="max-w-xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-neutral-200 mb-4">Campaign Lifecycle</h2>
 
           {settingsSaved && (
-            <div className="mb-5 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
-              <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Settings updated successfully!</span>
+            <div className="mb-4 p-2 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono text-emerald-300">
+              ✓ Settings saved
             </div>
           )}
 
-          <form onSubmit={handleSaveSettings} className="space-y-5">
-            {/* Campaign Status */}
+          <form onSubmit={handleSaveSettings} className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Campaign Lifecycle Status
-              </label>
+              <label className="block text-neutral-400 mb-1 font-mono">Campaign Status</label>
               <select
                 value={campaignStatus}
                 onChange={(e) => setCampaignStatus(e.target.value as any)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-medium transition-colors"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
               >
-                <option value="fundraising">Funding in Progress (Active)</option>
-                <option value="goal_reached">Goal Reached 🎉 (Contributions Closed)</option>
-                <option value="completed">Completed / Hardware Acquired</option>
-                <option value="refunds">Refunds in Process</option>
-                <option value="interest">Interest Phase</option>
+                <option value="fundraising">fundraising (active)</option>
+                <option value="goal_reached">goal_reached (donations paused)</option>
+                <option value="completed">completed (hardware received)</option>
+                <option value="refunds">refunds (processing refunds)</option>
               </select>
             </div>
 
-            {/* Fundraising Active Toggle */}
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-950 border border-zinc-800">
-              <div>
-                <span className="text-xs font-medium text-zinc-200 block">Accept New Donations</span>
-                <span className="text-[11px] text-zinc-500">
-                  When disabled, donation buttons are deactivated on the public page.
-                </span>
-              </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-950 border border-neutral-800 font-mono">
+              <span className="text-neutral-300">Accept New Contributions</span>
               <input
                 type="checkbox"
                 checked={fundraisingEnabled}
                 onChange={(e) => setFundraisingEnabled(e.target.checked)}
-                className="w-5 h-5 rounded bg-zinc-900 border-zinc-700 text-blue-600 focus:ring-blue-500/20 focus:ring-offset-0 cursor-pointer"
+                className="w-4 h-4 rounded bg-neutral-900 border-neutral-700 text-blue-600 focus:ring-0"
               />
             </div>
 
-            {/* Purchase Status */}
-            <div className="pt-2 border-t border-zinc-800/80">
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Hardware Procurement Status
-              </label>
+            <div>
+              <label className="block text-neutral-400 mb-1 font-mono">Hardware Procurement Status</label>
               <select
                 value={purchaseStatus}
                 onChange={(e) => setPurchaseStatus(e.target.value as any)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
               >
-                <option value="pending">Pending (Target not reached / not yet ordered)</option>
-                <option value="ordered">Device Ordered (Awaiting shipment)</option>
-                <option value="received">Device Received (In hands for ROM development)</option>
+                <option value="pending">pending (not yet ordered)</option>
+                <option value="ordered">ordered (awaiting delivery)</option>
+                <option value="received">received (in hands for development)</option>
               </select>
             </div>
 
-            {/* Proof URL */}
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Purchase Proof / Receipt URL <span className="text-zinc-500">(optional)</span>
-              </label>
+              <label className="block text-neutral-400 mb-1 font-mono">Purchase Proof / Receipt URL</label>
               <input
                 type="url"
                 value={purchaseProofUrl}
                 onChange={(e) => setPurchaseProofUrl(e.target.value)}
-                placeholder="https://example.com/receipt-or-photo.jpg"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                placeholder="https://..."
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
               />
-              <span className="text-[11px] text-zinc-500 block mt-1">
-                Public link to official invoice, order receipt, or unboxing image.
-              </span>
             </div>
 
-            {/* Purchase Notes */}
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                Dev Notes on Hardware Status <span className="text-zinc-500">(optional)</span>
-              </label>
+              <label className="block text-neutral-400 mb-1 font-mono">Dev Hardware Notes</label>
               <textarea
                 rows={2}
                 value={purchaseNotes}
                 onChange={(e) => setPurchaseNotes(e.target.value)}
-                placeholder="e.g. Ordered Xiaomi Pad 8 12+256GB Cyan Blue + Pen from official Mi Store. Tracking number shared on Telegram."
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 resize-none transition-colors"
+                placeholder="Order details, tracking info, specs"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 focus:outline-none resize-none"
               />
             </div>
 
-            {/* Payment Details */}
-            <div className="pt-2 border-t border-zinc-800/80 space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  UPI ID (VPA)
-                </label>
-                <input
-                  type="text"
-                  value={upiId}
-                  onChange={(e) => setUpiId(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-colors"
-                />
-              </div>
+            <div>
+              <label className="block text-neutral-400 mb-1 font-mono">UPI ID</label>
+              <input
+                type="text"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
+              />
+            </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  International Payment Gateway URL
-                </label>
-                <input
-                  type="url"
-                  value={paymentUrl}
-                  onChange={(e) => setPaymentUrl(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-colors"
-                />
-              </div>
+            <div>
+              <label className="block text-neutral-400 mb-1 font-mono">Payment Gateway URL</label>
+              <input
+                type="url"
+                value={paymentUrl}
+                onChange={(e) => setPaymentUrl(e.target.value)}
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
+              />
             </div>
 
             <button
               type="submit"
               disabled={savingSettings}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-sm font-medium text-white transition-all flex items-center justify-center gap-2 shadow-sm"
+              className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors"
             >
-              {savingSettings ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <span>Save Campaign Settings</span>
-              )}
+              {savingSettings ? 'Saving...' : 'Save Settings'}
             </button>
           </form>
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* TAB 3: AUDIT HISTORY                                      */}
+      {/* HISTORY TAB                                               */}
       {/* ========================================================= */}
       {activeTab === 'history' && (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-base font-bold text-white">Verified & Rejected History</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Approved donations with locked historical conversion rates, alongside rejected submissions.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            {approvedList.map((item) => (
-              <div
-                key={item.id}
-                className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 border border-emerald-500/20 font-medium text-[10px]">
-                      Approved
-                    </span>
-                    <span className="font-semibold text-zinc-200">
-                      {item.display_name}
-                    </span>
-                    <span className="text-zinc-500 font-mono">
-                      (Ref: {item.payment_reference})
-                    </span>
-                  </div>
-                  <div className="mt-1 text-zinc-500 font-mono">
-                    Locked at approval: 1 USD = ₹{item.fx_rate?.toFixed(2) || 'N/A'} • Approved on{' '}
-                    {item.approved_at ? new Date(item.approved_at).toLocaleString() : 'N/A'}
-                  </div>
+        <div className="space-y-2">
+          {approvedList.map((item) => (
+            <div
+              key={item.id}
+              className="bg-neutral-900/40 border border-neutral-800 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono"
+            >
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-400">✓ approved</span>
+                  <span className="text-neutral-200 font-semibold">{item.display_name}</span>
+                  <span className="text-neutral-600">Ref: {item.payment_reference}</span>
                 </div>
-
-                <div className="text-right sm:shrink-0 font-mono">
-                  <div className="text-sm font-bold text-white">
-                    {item.native_currency} {item.native_amount}
-                  </div>
-                  <div className="text-[11px] text-zinc-400">
-                    ≈ ${item.usd_amount} / ₹{item.inr_amount}
-                  </div>
+                <div className="text-[11px] text-neutral-500 mt-0.5">
+                  Locked rate: 1 USD = ₹{item.fx_rate?.toFixed(2) || 'N/A'} • {item.approved_at ? new Date(item.approved_at).toLocaleDateString() : ''}
                 </div>
               </div>
-            ))}
 
-            {rejectedList.map((item) => (
-              <div
-                key={item.id}
-                className="bg-zinc-900/30 border border-zinc-800/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs opacity-75"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-red-950/40 text-red-400 border border-red-500/20 font-medium text-[10px]">
-                      Rejected
-                    </span>
-                    <span className="font-semibold text-zinc-300">
-                      {item.display_name}
-                    </span>
-                    <span className="text-zinc-500 font-mono">
-                      (Ref: {item.payment_reference})
-                    </span>
-                  </div>
-                  <div className="mt-1 text-zinc-500">
-                    Excluded from public tracker and totals
-                  </div>
-                </div>
-
-                <div className="text-right sm:shrink-0 font-mono text-zinc-400">
-                  {item.native_currency} {item.native_amount}
-                </div>
+              <div className="text-right sm:shrink-0 font-mono">
+                <span className="text-neutral-100 font-semibold">${item.usd_amount}</span>
+                <span className="text-neutral-500 ml-1.5">(≈ ₹{item.inr_amount})</span>
               </div>
-            ))}
+            </div>
+          ))}
 
-            {approvedList.length === 0 && rejectedList.length === 0 && (
-              <div className="p-8 text-center text-zinc-500 text-xs">
-                No historical records found yet.
+          {rejectedList.map((item) => (
+            <div
+              key={item.id}
+              className="bg-neutral-900/20 border border-neutral-800/60 rounded-lg p-3 flex items-center justify-between text-xs font-mono opacity-60"
+            >
+              <div>
+                <span className="text-red-400 mr-1.5">✕ rejected</span>
+                <span className="text-neutral-400">{item.display_name}</span>
+                <span className="text-neutral-600 ml-2">Ref: {item.payment_reference}</span>
               </div>
-            )}
-          </div>
+              <span className="text-neutral-500">{item.native_currency} {item.native_amount}</span>
+            </div>
+          ))}
+
+          {approvedList.length === 0 && rejectedList.length === 0 && (
+            <div className="p-6 text-center text-neutral-600 text-xs font-mono">
+              No historical records
+            </div>
+          )}
         </div>
       )}
 
       {/* ========================================================= */}
-      {/* TAB 4: SETUP GUIDE (Simple terms)                         */}
+      {/* SETUP GUIDE TAB                                           */}
       {/* ========================================================= */}
       {activeTab === 'setup' && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 max-w-3xl space-y-6 text-sm text-zinc-300">
-          <div>
-            <h2 className="text-lg font-bold text-white">Simple Backend Setup Guide (Supabase)</h2>
-            <p className="text-xs text-zinc-400 mt-1">
-              Follow these 4 simple steps to connect your free database and create your admin password.
-            </p>
-          </div>
+        <div className="max-w-2xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 text-xs text-neutral-300 space-y-4">
+          <h2 className="text-sm font-semibold text-neutral-100">Simple Supabase Setup (3 Minutes)</h2>
 
-          <div className="space-y-4">
-            {/* Step 1 */}
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-white">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">1</span>
-                <span>Create a free Supabase project</span>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed pl-7">
-                Go to <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">supabase.com</a>, log in with GitHub, and click <strong>"New Project"</strong>. Give it any name (e.g. <code className="text-zinc-200">xiaomi-pad-8</code>) and choose a database password.
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
+              <strong className="text-neutral-100 block mb-1">1. Create Supabase Project</strong>
+              <p className="text-neutral-400">
+                Go to <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">supabase.com</a>, log in with GitHub, and click <strong>New Project</strong>. Choose a name and password.
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-white">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">2</span>
-                <span>Run the SQL Database Script</span>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed pl-7">
-                Inside your Supabase project dashboard:
-                <br />1. Click the <strong>SQL Editor</strong> tab on the left sidebar.
-                <br />2. Click <strong>"New query"</strong>.
-                <br />3. Copy and paste the contents of <code className="text-zinc-200">supabase/schema.sql</code> into the query box and click <strong>"Run"</strong>.
-                <br />This instantly creates the tables, security policies, and views.
+            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
+              <strong className="text-neutral-100 block mb-1">2. Paste SQL Script</strong>
+              <p className="text-neutral-400">
+                In Supabase, click <strong>SQL Editor</strong> &gt; <strong>New Query</strong>. Copy the entire contents of <code className="text-neutral-200">supabase/schema.sql</code> and click <strong>Run</strong>.
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-white">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">3</span>
-                <span>Create your Admin User & Password</span>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed pl-7">
-                1. In Supabase, click <strong>Authentication</strong> &gt; <strong>Users</strong>.
-                <br />2. Click <strong>"Add user"</strong> &gt; <strong>"Create user"</strong>.
-                <br />3. Enter your desired admin email and a strong password (e.g. your email and password to log in here).
-                <br />4. Check <strong>"Auto Confirm User"</strong> so you can log in immediately without waiting for an email confirmation.
+            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
+              <strong className="text-neutral-100 block mb-1">3. Create Admin Login</strong>
+              <p className="text-neutral-400">
+                Go to <strong>Authentication</strong> &gt; <strong>Users</strong> &gt; <strong>Add user</strong> &gt; <strong>Create user</strong>. Enter your email and a password, and toggle <strong>Auto Confirm User</strong> to ON.
               </p>
             </div>
 
-            {/* Step 4 */}
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-white">
-                <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">4</span>
-                <span>Copy your API Keys into .env / GitHub Secrets</span>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed pl-7">
-                In Supabase, go to <strong>Project Settings</strong> (gear icon) &gt; <strong>API</strong>:
-                <br />• Copy <strong>Project URL</strong> &rarr; <code className="text-zinc-200">VITE_SUPABASE_URL</code>
-                <br />• Copy <strong>anon / public key</strong> &rarr; <code className="text-zinc-200">VITE_SUPABASE_ANON_KEY</code>
-                <br />Add these to your local <code className="text-zinc-200">.env</code> file (or GitHub repository secrets for GitHub Actions deployment).
+            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
+              <strong className="text-neutral-100 block mb-1">4. Copy Keys to .env</strong>
+              <p className="text-neutral-400">
+                Go to <strong>Project Settings</strong> &gt; <strong>API</strong>. Copy <strong>Project URL</strong> and <strong>anon key</strong> into your <code className="text-neutral-200">.env</code> file.
               </p>
             </div>
           </div>

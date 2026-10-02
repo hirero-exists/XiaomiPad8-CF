@@ -1,5 +1,4 @@
 import React from 'react';
-import { Check } from 'lucide-react';
 import { CAMPAIGN_CONFIG } from '../config';
 
 interface MilestonesProps {
@@ -12,62 +11,52 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
   const milestones = CAMPAIGN_CONFIG.MILESTONES;
 
   const isMilestoneReached = (m: (typeof milestones)[0]): boolean => {
-    if (m.targetUsd) {
-      return totalUsdRaised >= m.targetUsd;
-    }
-    if (m.targetInr) {
-      // Reached if total INR is >= target, OR converted USD meets it
-      const inrFromUsd = totalUsdRaised * fxRate;
-      return totalInrRaised >= m.targetInr || inrFromUsd >= m.targetInr;
-    }
-    return false;
+    if (totalUsdRaised >= m.usdTarget) return true;
+    const inrFromUsd = totalUsdRaised * fxRate;
+    return totalInrRaised >= m.inrApprox || inrFromUsd >= m.inrApprox;
   };
 
   return (
-    <div className="py-6 border-b border-zinc-800/60">
-      <div className="text-xs uppercase tracking-wider font-semibold text-zinc-500 mb-4 text-center sm:text-left">
-        Milestone Tracker
+    <div className="py-5 sm:py-6 border-b border-neutral-800/80">
+      <div className="text-[11px] uppercase tracking-wider font-mono text-neutral-500 mb-3">
+        Milestones
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {milestones.map((m) => {
           const reached = isMilestoneReached(m);
 
           return (
             <div
               key={m.id}
-              className={`rounded-xl p-3.5 border transition-all text-center flex flex-col items-center justify-center gap-2 ${
+              className={`rounded-lg p-2.5 sm:p-3 border transition-colors ${
                 reached
-                  ? 'bg-blue-950/20 border-blue-500/30 text-white'
-                  : 'bg-zinc-900/40 border-zinc-800/80 text-zinc-500'
+                  ? 'bg-neutral-900 border-neutral-700 text-neutral-200'
+                  : 'bg-neutral-900/30 border-neutral-800/60 text-neutral-500'
               }`}
             >
-              <div className="flex items-center gap-1.5">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
-                    reached
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
+              <div className="flex items-center gap-1.5 mb-1">
+                <span
+                  className={`inline-block w-2 h-2 rounded-full ${
+                    reached ? 'bg-blue-400' : 'bg-neutral-700'
                   }`}
-                >
-                  {reached ? (
-                    <Check className="w-3 h-3 stroke-[3]" />
-                  ) : (
-                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
-                  )}
-                </div>
-                <span className={`text-xs font-semibold font-mono ${reached ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                  {m.label}
+                />
+                <span className="text-xs font-mono font-medium text-neutral-200 truncate">
+                  ${m.usdTarget} {m.isFinal && <span className="text-[10px] text-blue-400 font-normal">FINAL</span>}
                 </span>
               </div>
 
-              <span className="text-[11px] text-zinc-500">
+              <div className="text-[11px] font-mono text-neutral-500 truncate">
+                (≈ ₹{m.inrApprox.toLocaleString('en-IN')})
+              </div>
+
+              <div className="mt-2 text-[10px] font-mono uppercase tracking-wider">
                 {reached ? (
-                  <span className="text-blue-400 font-medium">Completed</span>
+                  <span className="text-blue-400 font-medium">✓ Reached</span>
                 ) : (
-                  <span>Pending</span>
+                  <span className="text-neutral-600">Pending</span>
                 )}
-              </span>
+              </div>
             </div>
           );
         })}

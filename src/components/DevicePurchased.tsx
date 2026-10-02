@@ -1,5 +1,4 @@
 import React from 'react';
-import { Tablet, PenTool, Shield, UserCheck, Info } from 'lucide-react';
 import { CampaignData } from '../lib/types';
 import { CAMPAIGN_CONFIG } from '../config';
 
@@ -19,102 +18,60 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
   const devContributionUsd = Math.round(devContributionInr / fxRate);
 
   return (
-    <section className="py-8 border-b border-zinc-800/60">
-      <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 sm:p-7">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-5 pb-4 border-b border-zinc-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
-              <Tablet className="w-4 h-4 text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-white">Device being purchased</h2>
-              <p className="text-xs text-zinc-400">Target hardware specifications and budget allocation</p>
-            </div>
+    <section className="py-6 sm:py-8 border-b border-neutral-800/80">
+      <div className="bg-neutral-900/40 border border-neutral-800 rounded-xl p-5 sm:p-6">
+        {/* Title */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-4 pb-3 border-b border-neutral-800">
+          <div>
+            <h2 className="text-base font-semibold text-neutral-100">
+              Device being purchased
+            </h2>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              {CAMPAIGN_CONFIG.DEVICE_NAME} ({CAMPAIGN_CONFIG.DEVICE_SPECS})
+            </p>
           </div>
-
-          <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
-            <PenTool className="w-3 h-3 text-blue-400" />
-            Includes Official Pen
+          <span className="text-xs font-mono text-neutral-500">
+            Hardware co-funding
           </span>
         </div>
 
-        {/* Specs and Pricing Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Card 1: Device Specs & Retail */}
-          <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 flex flex-col justify-between">
-            <div>
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">Hardware & Config</span>
-              <h3 className="text-sm font-semibold text-zinc-100 mt-1">
-                {CAMPAIGN_CONFIG.DEVICE_NAME}
-              </h3>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                {CAMPAIGN_CONFIG.DEVICE_SPECS}
-              </p>
+        {/* 3 Metrics: USD main, bracketed INR */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Total Cost */}
+          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
+            <span className="text-[11px] font-mono uppercase text-neutral-500 block">Total Device Cost</span>
+            <div className="mt-1 font-mono">
+              <span className="text-lg font-bold text-neutral-100">~${devicePriceUsd}</span>
+              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{devicePriceInr.toLocaleString('en-IN')})</span>
             </div>
-            <div className="mt-4 pt-3 border-t border-zinc-800/80">
-              <span className="text-[11px] text-zinc-500 block">Estimated Retail Price</span>
-              <div className="flex items-baseline gap-1.5 font-mono">
-                <span className="text-lg font-bold text-white">₹{devicePriceInr.toLocaleString('en-IN')}</span>
-                <span className="text-xs text-zinc-400">(~${devicePriceUsd})</span>
-              </div>
-            </div>
+            <span className="text-[11px] text-neutral-500 block mt-1">Retail price with official pen</span>
           </div>
 
-          {/* Card 2: Community Contribution */}
-          <div className="bg-blue-950/20 border border-blue-500/25 rounded-xl p-4 flex flex-col justify-between">
-            <div>
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-blue-400 flex items-center gap-1">
-                <Shield className="w-3 h-3" />
-                Community Target
-              </span>
-              <h3 className="text-sm font-semibold text-zinc-100 mt-1">
-                Crowdfunding Goal
-              </h3>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                Capped target for community supporters
-              </p>
+          {/* Community Goal */}
+          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
+            <span className="text-[11px] font-mono uppercase text-blue-400 block">Community Goal</span>
+            <div className="mt-1 font-mono">
+              <span className="text-lg font-bold text-neutral-100">${communityGoalUsd}</span>
+              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
             </div>
-            <div className="mt-4 pt-3 border-t border-blue-500/20">
-              <span className="text-[11px] text-zinc-400 block">Community Target</span>
-              <div className="flex items-baseline gap-1.5 font-mono">
-                <span className="text-lg font-bold text-blue-400">${communityGoalUsd}</span>
-                <span className="text-xs text-zinc-400">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
-              </div>
-            </div>
+            <span className="text-[11px] text-neutral-500 block mt-1">Capped crowdfund target</span>
           </div>
 
-          {/* Card 3: Developer Personal Contribution */}
-          <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 flex flex-col justify-between">
-            <div>
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-emerald-400 flex items-center gap-1">
-                <UserCheck className="w-3 h-3" />
-                Developer Share
-              </span>
-              <h3 className="text-sm font-semibold text-zinc-100 mt-1">
-                Remaining Device Cost
-              </h3>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                Paid personally by the developer
-              </p>
+          {/* Dev Contribution */}
+          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
+            <span className="text-[11px] font-mono uppercase text-neutral-400 block">Developer Contribution</span>
+            <div className="mt-1 font-mono">
+              <span className="text-lg font-bold text-neutral-100">~${devContributionUsd}</span>
+              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{devContributionInr.toLocaleString('en-IN')})</span>
             </div>
-            <div className="mt-4 pt-3 border-t border-zinc-800/80">
-              <span className="text-[11px] text-zinc-500 block">Personal Contribution</span>
-              <div className="flex items-baseline gap-1.5 font-mono">
-                <span className="text-lg font-bold text-emerald-400">≈ ₹{devContributionInr.toLocaleString('en-IN')}</span>
-                <span className="text-xs text-zinc-400">(~${devContributionUsd})</span>
-              </div>
-            </div>
+            <span className="text-[11px] text-neutral-500 block mt-1">Paid personally out-of-pocket</span>
           </div>
         </div>
 
-        {/* Transparency Footnote */}
-        <div className="mt-4 flex items-start gap-2 text-xs text-zinc-400 bg-zinc-800/30 rounded-lg p-3 border border-zinc-800/60">
-          <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            <strong className="text-zinc-300">Co-funded purchase:</strong> The community is <span className="underline decoration-zinc-600 underline-offset-2">not</span> being asked to pay the full device price. The community goal covers approximately half of the device cost, and the remaining ₹{devContributionInr.toLocaleString('en-IN')} will be paid personally out of pocket by the developer.
-          </p>
-        </div>
+        {/* Note */}
+        <p className="mt-4 text-xs text-neutral-400 leading-relaxed">
+          The community is not asked to pay the full device cost. The developer will personally cover the remaining ~${devContributionUsd} (≈ ₹{devContributionInr.toLocaleString('en-IN')}).
+        </p>
       </div>
     </section>
   );

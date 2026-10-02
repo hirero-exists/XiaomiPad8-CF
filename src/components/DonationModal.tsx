@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, ShieldAlert, Loader2, Lock } from 'lucide-react';
+import { X, Check, Loader2 } from 'lucide-react';
 import { PaymentMethod } from '../lib/types';
 import { submitDonation } from '../lib/supabase';
 
@@ -34,12 +34,12 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setErrorMessage('Please enter a valid donation amount.');
+      setErrorMessage('Please enter a valid amount.');
       return;
     }
 
     if (!reference.trim()) {
-      setErrorMessage('Transaction / reference number is required.');
+      setErrorMessage('Reference / UTR number is required.');
       return;
     }
 
@@ -59,7 +59,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
       if (res.success) {
         setSubmitted(true);
       } else {
-        setErrorMessage(res.error || 'Failed to submit verification request. Please try again.');
+        setErrorMessage(res.error || 'Submission failed. Please try again.');
       }
     } catch {
       setErrorMessage('Network error. Please try again.');
@@ -80,78 +80,72 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
     >
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 sm:p-7 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div className="bg-[#121212] border border-neutral-800 rounded-xl max-w-md w-full p-5 sm:p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleResetAndClose}
-          className="absolute top-5 right-5 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+          className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded hover:bg-neutral-800 transition-colors"
           aria-label="Close modal"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {submitted ? (
-          /* Success Screen */
-          <div className="text-center py-6">
-            <div className="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-400">
-              <CheckCircle className="w-7 h-7" />
+          /* Confirmation */
+          <div className="text-center py-4">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <Check className="w-5 h-5 stroke-[2.5]" />
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-2">
+            <h3 className="text-base font-semibold text-neutral-100 mb-1">
               Payment submitted
             </h3>
 
-            <p className="text-sm text-zinc-300 max-w-sm mx-auto leading-relaxed mb-6">
+            <p className="text-xs text-neutral-400 leading-relaxed mb-4">
               It will appear on the public tracker after verification.
             </p>
 
-            <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-4 text-left text-xs text-zinc-400 space-y-2 mb-6">
-              <div className="flex items-center gap-1.5 text-zinc-300 font-medium">
-                <Lock className="w-3.5 h-3.5 text-blue-400" />
-                <span>Privacy Guarantee</span>
-              </div>
-              <p>
-                Your reference number (<span className="font-mono text-zinc-300">{reference}</span>) has been securely encrypted and stored for administrator verification only. It will never be displayed publicly.
-              </p>
+            <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/80 text-left text-[11px] text-neutral-500 font-mono mb-4">
+              Reference: <span className="text-neutral-300">{reference}</span>
+              <br />
+              Status: <span className="text-blue-400">pending admin review</span>
+              <br />
+              Reference numbers are kept private and never shown publicly.
             </div>
 
             <button
               onClick={handleResetAndClose}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-medium text-white transition-colors"
+              className="w-full py-2.5 px-4 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-mono text-neutral-200 transition-colors"
             >
               Done
             </button>
           </div>
         ) : (
-          /* Submission Form */
+          /* Form */
           <div>
-            <div className="mb-6">
-              <h3 id="modal-title" className="text-xl font-bold text-white">
+            <div className="mb-4">
+              <h3 className="text-base font-semibold text-neutral-100">
                 Submit Payment for Verification
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
-                Enter your transaction details so we can verify your contribution on the public funding tracker.
+              <p className="text-xs text-neutral-400 mt-0.5">
+                Verify your contribution on the public funding tracker.
               </p>
             </div>
 
             {errorMessage && (
-              <div className="mb-5 p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-xs text-red-300 flex items-start gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span>{errorMessage}</span>
+              <div className="mb-4 p-2.5 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300">
+                {errorMessage}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Payment Method Selector */}
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+              {/* Method Toggle */}
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  Payment Method
-                </label>
+                <label className="block text-neutral-400 mb-1">Payment Method</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -159,13 +153,13 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                       setPaymentMethod('upi');
                       setCurrency('INR');
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium border text-center transition-all ${
+                    className={`py-2 px-3 rounded-lg border text-center font-mono transition-colors ${
                       paymentMethod === 'upi'
-                        ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                        ? 'bg-neutral-800 border-neutral-600 text-white'
+                        : 'bg-neutral-950 border-neutral-800 text-neutral-400'
                     }`}
                   >
-                    UPI Transfer
+                    UPI
                   </button>
                   <button
                     type="button"
@@ -173,22 +167,22 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                       setPaymentMethod('international');
                       if (currency === 'INR') setCurrency('USD');
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium border text-center transition-all ${
+                    className={`py-2 px-3 rounded-lg border text-center font-mono transition-colors ${
                       paymentMethod === 'international'
-                        ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                        ? 'bg-neutral-800 border-neutral-600 text-white'
+                        : 'bg-neutral-950 border-neutral-800 text-neutral-400'
                     }`}
                   >
-                    International Gateway
+                    International
                   </button>
                 </div>
               </div>
 
               {/* Amount and Currency */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <label htmlFor="amount" className="block text-xs font-medium text-zinc-300 mb-1.5">
-                    Amount Paid <span className="text-red-400">*</span>
+                  <label htmlFor="amount" className="block text-neutral-400 mb-1">
+                    Amount Paid *
                   </label>
                   <input
                     id="amount"
@@ -199,19 +193,17 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                     placeholder="e.g. 500"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 font-mono"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="currency" className="block text-xs font-medium text-zinc-300 mb-1.5">
-                    Currency
-                  </label>
+                  <label htmlFor="currency" className="block text-neutral-400 mb-1">Currency</label>
                   <select
                     id="currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-2 text-neutral-100 focus:outline-none focus:border-neutral-600 font-mono"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -222,11 +214,10 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 </div>
               </div>
 
-              {/* Transaction / Reference Number */}
+              {/* Reference */}
               <div>
-                <label htmlFor="reference" className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  {paymentMethod === 'upi' ? 'UPI UTR / 12-digit Ref No.' : 'Transaction / Order ID'}{' '}
-                  <span className="text-red-400">*</span>
+                <label htmlFor="reference" className="block text-neutral-400 mb-1">
+                  {paymentMethod === 'upi' ? 'UPI UTR / 12-digit Ref No.' : 'Transaction / Reference ID'} *
                 </label>
                 <input
                   id="reference"
@@ -235,72 +226,67 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                   placeholder={paymentMethod === 'upi' ? 'e.g. 402918274619' : 'e.g. tx_01HJ8Z...'}
                   value={reference}
                   onChange={(e) => setReference(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 font-mono"
                 />
-                <span className="text-[11px] text-zinc-500 block mt-1">
-                  Private & confidential. Used solely for admin verification.
+                <span className="text-[10px] text-neutral-500 block mt-0.5">
+                  Private & strictly confidential. Admin only.
                 </span>
               </div>
 
               {/* Display Name */}
               <div>
-                <label htmlFor="displayName" className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  Display Name <span className="text-zinc-500">(optional)</span>
+                <label htmlFor="displayName" className="block text-neutral-400 mb-1">
+                  Display Name <span className="text-neutral-600">(optional)</span>
                 </label>
                 <input
                   id="displayName"
                   type="text"
-                  placeholder="e.g. Kazu or Alex"
+                  placeholder="e.g. Kazu"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
                 />
               </div>
 
-              {/* Show Name Checkbox */}
-              <div className="flex items-center gap-2.5 pt-1">
+              {/* Anonymous Checkbox */}
+              <div className="flex items-center gap-2 pt-0.5">
                 <input
                   id="showName"
                   type="checkbox"
                   checked={showName}
                   onChange={(e) => setShowName(e.target.checked)}
-                  className="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-blue-600 focus:ring-blue-500/20 focus:ring-offset-0 focus:outline-none"
+                  className="w-3.5 h-3.5 rounded bg-neutral-950 border-neutral-800 text-blue-600 focus:ring-0 focus:outline-none"
                 />
-                <label htmlFor="showName" className="text-xs text-zinc-300 select-none cursor-pointer">
+                <label htmlFor="showName" className="text-neutral-300 select-none cursor-pointer">
                   Show my name publicly on the verified backers list
                 </label>
               </div>
-              {!showName && (
-                <p className="text-[11px] text-zinc-500 pl-6">
-                  Will appear as <strong className="text-zinc-400">Anonymous</strong> on the public list.
-                </p>
-              )}
 
-              {/* Optional Note / Message */}
+              {/* Message */}
               <div>
-                <label htmlFor="message" className="block text-xs font-medium text-zinc-300 mb-1.5">
-                  Message / Note <span className="text-zinc-500">(optional)</span>
+                <label htmlFor="message" className="block text-neutral-400 mb-1">
+                  Optional note / message
                 </label>
-                <textarea
+                <input
                   id="message"
-                  rows={2}
-                  placeholder="e.g. Looking forward to LineageOS support!"
+                  type="text"
+                  placeholder="e.g. For kernel trees"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 resize-none transition-colors"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-sm font-medium text-white transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors flex items-center justify-center gap-1.5"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       <span>Submitting...</span>
                     </>
                   ) : (

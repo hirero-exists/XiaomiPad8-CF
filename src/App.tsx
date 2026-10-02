@@ -131,6 +131,7 @@ export function App() {
       {/* Top Navbar */}
       <Navbar
         campaign={campaign}
+        totalUsdRaised={summary.total_usd_raised}
         onOpenAdmin={handleOpenAdmin}
         isAdminLoggedIn={isAdminLoggedIn}
       />
