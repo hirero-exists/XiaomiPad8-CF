@@ -136,7 +136,7 @@ export async function submitDonation(payload: {
 
   try {
     // 1. Try secure RPC function first (bypasses all client-side RLS issues)
-    const { data: rpcData, error: rpcError } = await supabase.rpc('submit_donation', {
+    const { error: rpcError } = await supabase.rpc('submit_donation', {
       p_payment_method: payload.payment_method,
       p_native_amount: payload.native_amount,
       p_native_currency: payload.native_currency,
@@ -146,7 +146,7 @@ export async function submitDonation(payload: {
       p_message: payload.message?.trim() || null
     });
 
-    if (!rpcError && rpcData?.success) {
+    if (!rpcError) {
       return { success: true };
     }
 
@@ -165,6 +165,12 @@ export async function submitDonation(payload: {
     ]);
 
     if (insertError) {
+      if (insertError.message.includes('row-level security')) {
+        return {
+          success: false,
+          error: 'Database RLS policy blocked insert. Please run supabase/fix_rls.sql in Supabase SQL Editor.'
+        };
+      }
       return { success: false, error: insertError.message };
     }
     return { success: true };
