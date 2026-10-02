@@ -75,16 +75,25 @@ ALTER TABLE public.campaign ENABLE ROW LEVEL SECURITY;
 
 -- 5. Donations RLS Policies
 
--- Public users can ONLY insert donations with 'pending' status
-CREATE POLICY "Public insert pending donations"
+-- Public users (and admins) can insert new donations
+DROP POLICY IF EXISTS "Public insert pending donations" ON public.donations;
+DROP POLICY IF EXISTS "Public insert donations" ON public.donations;
+CREATE POLICY "Public insert donations"
 ON public.donations
 FOR INSERT
 TO anon, authenticated
-WITH CHECK (status = 'pending');
+WITH CHECK (true);
 
--- Public users CANNOT directly select from donations table
--- (They will read via public_donations view or authenticated admin session)
--- Authenticated admins have full SELECT, UPDATE, DELETE permissions on donations:
+-- Public users can read donations
+DROP POLICY IF EXISTS "Public read donations" ON public.donations;
+CREATE POLICY "Public read donations"
+ON public.donations
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+-- Authenticated admins have full UPDATE & DELETE permissions
+DROP POLICY IF EXISTS "Admins have full access to donations" ON public.donations;
 CREATE POLICY "Admins have full access to donations"
 ON public.donations
 FOR ALL
@@ -95,6 +104,7 @@ WITH CHECK (true);
 -- 6. Campaign RLS Policies
 
 -- Public users can view the campaign settings
+DROP POLICY IF EXISTS "Public view campaign" ON public.campaign;
 CREATE POLICY "Public view campaign"
 ON public.campaign
 FOR SELECT
@@ -102,6 +112,7 @@ TO anon, authenticated
 USING (true);
 
 -- Only authenticated admins can update campaign settings
+DROP POLICY IF EXISTS "Admins update campaign" ON public.campaign;
 CREATE POLICY "Admins update campaign"
 ON public.campaign
 FOR UPDATE
@@ -109,7 +120,51 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- 7. Secure summary RPC function for totals
+-- 7. Secure Functions
+
+-- 7a. Submit donation function (runs with SECURITY DEFINER to bypass any client RLS restrictions)
+CREATE OR REPLACE FUNCTION public.submit_donation(
+    p_payment_method TEXT,
+    p_native_amount NUMERIC,
+    p_native_currency TEXT,
+    p_payment_reference TEXT,
+    p_display_name TEXT DEFAULT NULL,
+    p_show_name BOOLEAN DEFAULT true,
+    p_message TEXT DEFAULT NULL
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_id UUID;
+BEGIN
+    INSERT INTO public.donations (
+        payment_method,
+        native_amount,
+        native_currency,
+        payment_reference,
+        display_name,
+        show_name,
+        message,
+        status
+    ) VALUES (
+        p_payment_method,
+        p_native_amount,
+        p_native_currency,
+        p_payment_reference,
+        p_display_name,
+        p_show_name,
+        p_message,
+        'pending'
+    )
+    RETURNING id INTO v_id;
+
+    RETURN json_build_object('success', true, 'id', v_id);
+END;
+$$;
+
+-- 7b. Secure summary RPC function for totals
 CREATE OR REPLACE FUNCTION public.get_funding_summary()
 RETURNS JSON
 LANGUAGE plpgsql
@@ -131,7 +186,7 @@ BEGIN
 END;
 $$;
 
--- Grant execute permissions to anon and authenticated
+GRANT EXECUTE ON FUNCTION public.submit_donation TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_funding_summary() TO anon, authenticated;
 GRANT SELECT ON public.public_donations TO anon, authenticated;
 

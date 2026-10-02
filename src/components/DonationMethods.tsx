@@ -122,14 +122,20 @@ export const DonationMethods: React.FC<DonationMethodsProps> = ({
 
               {showQr && (
                 <div className="mb-4 p-4 bg-neutral-950 rounded border border-[var(--line)] text-center">
-                  <div className="bg-white p-2.5 rounded inline-block mx-auto mb-2">
+                  <div className="bg-white p-3 rounded inline-block mx-auto mb-2 shadow-sm">
                     <img
                       src={CAMPAIGN_CONFIG.UPI_QR_IMAGE}
-                      alt="UPI QR Code"
-                      className="w-36 h-36 object-contain"
+                      alt="UPI QR Code for hirero@slc"
+                      className="w-48 h-48 object-contain"
                     />
                   </div>
-                  <p className="text-[11px] font-mono text-[var(--muted)]">Scan using any UPI app</p>
+                  <p className="text-[11px] font-mono text-[var(--muted)]">Scan with GPay, PhonePe, Paytm, or BHIM</p>
+                  <a
+                    href={`upi://pay?pa=${upiId}&pn=Hirero&cu=INR&tn=PAD8`}
+                    className="inline-block mt-2 text-xs font-mono text-blue-400 hover:text-blue-300 underline sm:hidden"
+                  >
+                    Tap to open UPI app directly
+                  </a>
                 </div>
               )}
             </div>

@@ -135,7 +135,23 @@ export async function submitDonation(payload: {
   }
 
   try {
-    const { error } = await supabase.from('donations').insert([
+    // 1. Try secure RPC function first (bypasses all client-side RLS issues)
+    const { data: rpcData, error: rpcError } = await supabase.rpc('submit_donation', {
+      p_payment_method: payload.payment_method,
+      p_native_amount: payload.native_amount,
+      p_native_currency: payload.native_currency,
+      p_payment_reference: payload.payment_reference.trim(),
+      p_display_name: payload.show_name && payload.display_name?.trim() ? payload.display_name.trim() : 'Anonymous',
+      p_show_name: payload.show_name,
+      p_message: payload.message?.trim() || null
+    });
+
+    if (!rpcError && rpcData?.success) {
+      return { success: true };
+    }
+
+    // 2. Fallback to direct table insert
+    const { error: insertError } = await supabase.from('donations').insert([
       {
         payment_method: payload.payment_method,
         native_amount: payload.native_amount,
@@ -144,12 +160,12 @@ export async function submitDonation(payload: {
         display_name: payload.show_name && payload.display_name?.trim() ? payload.display_name.trim() : 'Anonymous',
         show_name: payload.show_name,
         message: payload.message?.trim() || null,
-        status: 'pending' // always pending on submission
+        status: 'pending'
       }
     ]);
 
-    if (error) {
-      return { success: false, error: error.message };
+    if (insertError) {
+      return { success: false, error: insertError.message };
     }
     return { success: true };
   } catch (err: unknown) {
