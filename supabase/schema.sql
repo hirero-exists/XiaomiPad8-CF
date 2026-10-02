@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.campaign (
     device_price_inr NUMERIC NOT NULL DEFAULT 52000.00,
     fundraising_enabled BOOLEAN NOT NULL DEFAULT true,
     campaign_status TEXT NOT NULL DEFAULT 'fundraising' CHECK (campaign_status IN ('interest', 'fundraising', 'goal_reached', 'refunds', 'completed')),
-    payment_url TEXT DEFAULT 'https://example.com/donate',
+    payment_url TEXT DEFAULT 'https://www.thankyouverymuch.co/xiaomipad8',
     upi_id TEXT DEFAULT 'developer@upi',
     purchase_status TEXT DEFAULT 'pending' CHECK (purchase_status IN ('pending', 'ordered', 'received')),
     purchase_proof_url TEXT DEFAULT '',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.campaign (
 
 -- Seed initial campaign record if empty
 INSERT INTO public.campaign (id, usd_goal, device_price_inr, fundraising_enabled, campaign_status, payment_url, upi_id, purchase_status)
-VALUES ('xiaomi_pad_8', 350.00, 52000.00, true, 'fundraising', 'https://example.com/donate', 'developer@upi', 'pending')
+VALUES ('xiaomi_pad_8', 350.00, 52000.00, true, 'fundraising', 'https://www.thankyouverymuch.co/xiaomipad8', 'developer@upi', 'pending')
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Create donations table

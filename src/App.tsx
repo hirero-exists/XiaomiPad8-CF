@@ -1,15 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { FundingProgress } from './components/FundingProgress';
 import { Milestones } from './components/Milestones';
 import { DevicePurchased } from './components/DevicePurchased';
 import { DonationMethods } from './components/DonationMethods';
-import { RecentDonations } from './components/RecentDonations';
 import { WhyNeeded } from './components/WhyNeeded';
 import { Transparency } from './components/Transparency';
 import { RefundPolicy } from './components/RefundPolicy';
 import { Footer } from './components/Footer';
+import { DashboardView } from './components/DashboardView';
 import { DonationModal } from './components/DonationModal';
 import { AdminLogin } from './admin/AdminLogin';
 import { AdminDashboard } from './admin/AdminDashboard';
@@ -25,9 +24,12 @@ import { getLiveRates } from './lib/exchangeRate';
 import { CAMPAIGN_CONFIG } from './config';
 
 export function App() {
-  // Routing state
-  const [isAdminView, setIsAdminView] = useState(() => {
-    return window.location.hash === '#/admin' || window.location.pathname.endsWith('/admin');
+  // Navigation: 'campaign' | 'dashboard' | 'admin'
+  const [currentView, setCurrentView] = useState<'campaign' | 'dashboard' | 'admin'>(() => {
+    const hash = window.location.hash;
+    if (hash === '#/admin' || window.location.pathname.endsWith('/admin')) return 'admin';
+    if (hash === '#/dashboard' || window.location.pathname.endsWith('/dashboard')) return 'dashboard';
+    return 'campaign';
   });
 
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -56,19 +58,33 @@ export function App() {
   const [donations, setDonations] = useState<PublicDonation[]>([]);
   const [fxRate, setFxRate] = useState<number>(CAMPAIGN_CONFIG.FALLBACK_USD_TO_INR);
 
-  // Donation Modal state
+  // Verification modal state
   const [modalMethod, setModalMethod] = useState<PaymentMethod | null>(null);
 
-  // Sync hash routing
+  // Hash synchronization
   useEffect(() => {
     const handleHashChange = () => {
-      setIsAdminView(window.location.hash === '#/admin');
+      const hash = window.location.hash;
+      if (hash === '#/admin') {
+        setCurrentView('admin');
+      } else if (hash === '#/dashboard') {
+        setCurrentView('dashboard');
+      } else {
+        setCurrentView('campaign');
+      }
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Check auth session
+  const navigateTo = (view: 'campaign' | 'dashboard' | 'admin') => {
+    setCurrentView(view);
+    if (view === 'admin') window.location.hash = '#/admin';
+    else if (view === 'dashboard') window.location.hash = '#/dashboard';
+    else window.location.hash = '#/';
+  };
+
+  // Auth session check
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
       const mockSession = localStorage.getItem('xiaomi_pad_8_mock_admin_session');
@@ -88,7 +104,7 @@ export function App() {
   }, []);
 
   // Fetch campaign and public data
-  const loadPublicData = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
       const [campaignData, summaryData, donationsData, rates] = await Promise.all([
         fetchCampaignData(),
@@ -102,123 +118,116 @@ export function App() {
       setDonations(donationsData);
       setFxRate(rates.INR);
     } catch (err) {
-      console.error('Error loading public data:', err);
+      console.error('Error loading data:', err);
     }
   }, []);
 
   useEffect(() => {
-    loadPublicData();
-  }, [loadPublicData]);
-
-  // Admin routing helpers
-  const handleOpenAdmin = () => {
-    window.location.hash = '#/admin';
-    setIsAdminView(true);
-  };
-
-  const handleBackToSite = () => {
-    window.location.hash = '#/';
-    setIsAdminView(false);
-    loadPublicData();
-  };
+    loadData();
+  }, [loadData]);
 
   const isGoalReached =
     summary.total_usd_raised >= (campaign.usd_goal || 350) ||
     campaign.campaign_status === 'goal_reached';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0c0d0e] text-zinc-100 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--fg)] selection:bg-neutral-100 selection:text-neutral-900">
       {/* Top Navbar */}
       <Navbar
+        currentView={currentView}
+        onNavigate={navigateTo}
         campaign={campaign}
         totalUsdRaised={summary.total_usd_raised}
-        onOpenAdmin={handleOpenAdmin}
+        totalInrRaised={summary.total_inr_raised}
         isAdminLoggedIn={isAdminLoggedIn}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6">
-        {isAdminView ? (
-          isAdminLoggedIn ? (
-            <AdminDashboard
-              campaign={campaign}
-              onRefreshCampaign={loadPublicData}
-              onLogout={() => setIsAdminLoggedIn(false)}
-              onBackToSite={handleBackToSite}
-            />
-          ) : (
-            <AdminLogin
-              onLoginSuccess={() => setIsAdminLoggedIn(true)}
-              onBackToSite={handleBackToSite}
-            />
-          )
+      {/* Main View Router */}
+      <main className="flex-1">
+        {currentView === 'admin' ? (
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            {isAdminLoggedIn ? (
+              <AdminDashboard
+                campaign={campaign}
+                onRefreshCampaign={loadData}
+                onLogout={() => setIsAdminLoggedIn(false)}
+                onBackToSite={() => navigateTo('campaign')}
+              />
+            ) : (
+              <AdminLogin
+                onLoginSuccess={() => setIsAdminLoggedIn(true)}
+                onBackToSite={() => navigateTo('campaign')}
+              />
+            )}
+          </div>
+        ) : currentView === 'dashboard' ? (
+          <DashboardView
+            summary={summary}
+            campaign={campaign}
+            donations={donations}
+            fxRate={fxRate}
+            onNavigateToCampaign={() => navigateTo('campaign')}
+            onOpenVerificationModal={(method) => setModalMethod(method)}
+          />
         ) : (
-          /* Public Single-Page Layout */
-          <div className="space-y-2">
-            {/* 1. Hero */}
-            <Hero />
-
-            {/* 2. Funding Progress */}
-            <FundingProgress
+          /* Campaign View */
+          <div>
+            {/* 01 // Hero & Live Stats Strip */}
+            <Hero
+              campaign={campaign}
               summary={summary}
+              fxRate={fxRate}
+              onNavigateToDashboard={() => navigateTo('dashboard')}
+            />
+
+            {/* 02 // Why this device? */}
+            <WhyNeeded />
+
+            {/* 03 // Hardware specs & co-funding */}
+            <DevicePurchased
               campaign={campaign}
               fxRate={fxRate}
             />
 
-            {/* 3. Milestones */}
+            {/* 04 // Milestones */}
             <Milestones
               totalUsdRaised={summary.total_usd_raised}
               totalInrRaised={summary.total_inr_raised}
               fxRate={fxRate}
             />
 
-            {/* 4. Device Being Purchased */}
-            <DevicePurchased
-              campaign={campaign}
-              fxRate={fxRate}
-            />
-
-            {/* 5. Donation Methods */}
+            {/* 05 // Payment methods */}
             <DonationMethods
               campaign={campaign}
               onOpenVerificationModal={(method) => setModalMethod(method)}
               isGoalReached={isGoalReached}
             />
 
-            {/* 6. Recent Verified Contributions */}
-            <RecentDonations
-              donations={donations}
-            />
-
-            {/* 7. Why the Device is Needed */}
-            <WhyNeeded />
-
-            {/* 8. Transparency */}
+            {/* 06 // Verification & Transparency */}
             <Transparency />
 
-            {/* 9. Refund Policy */}
+            {/* 07 // Refund policy */}
             <RefundPolicy />
-
-            {/* 10. Footer */}
-            <Footer
-              onOpenAdmin={handleOpenAdmin}
-            />
           </div>
         )}
       </main>
 
-      {/* Verification Submission Modal */}
+      {/* Minimal Footer */}
+      <Footer onOpenAdmin={() => navigateTo('admin')} />
+
+      {/* Payment Verification Modal */}
       {modalMethod && (
         <DonationModal
           isOpen={Boolean(modalMethod)}
           initialMethod={modalMethod}
           onClose={() => {
             setModalMethod(null);
-            loadPublicData();
+            loadData();
           }}
         />
       )}
     </div>
   );
 }
+
 export default App;

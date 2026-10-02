@@ -18,60 +18,59 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
   const devContributionUsd = Math.round(devContributionInr / fxRate);
 
   return (
-    <section className="py-6 sm:py-8 border-b border-neutral-800/80">
-      <div className="bg-neutral-900/40 border border-neutral-800 rounded-xl p-5 sm:p-6">
-        {/* Title */}
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-4 pb-3 border-b border-neutral-800">
+    <section className="border-b border-[var(--line)]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h2 className="text-base font-semibold text-neutral-100">
-              Device being purchased
+            <div className="font-mono text-xs text-[var(--muted)] mb-2">
+              03 // HARDWARE ALLOCATION
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-100">
+              Hardware specs & developer co-funding.
             </h2>
-            <p className="text-xs text-neutral-400 mt-0.5">
-              {CAMPAIGN_CONFIG.DEVICE_NAME} ({CAMPAIGN_CONFIG.DEVICE_SPECS})
+            <p className="mt-2 text-xs text-[var(--muted)] leading-relaxed">
+              Target device: {CAMPAIGN_CONFIG.DEVICE_NAME} ({CAMPAIGN_CONFIG.DEVICE_SPECS})
             </p>
           </div>
-          <span className="text-xs font-mono text-neutral-500">
-            Hardware co-funding
-          </span>
+
+          <div className="md:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Total Device Cost */}
+              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">Total Device Cost</span>
+                <div className="font-mono mt-1">
+                  <span className="text-xl font-bold text-neutral-100">~${devicePriceUsd}</span>
+                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{devicePriceInr.toLocaleString('en-IN')})</span>
+                </div>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Retail cost with pen</span>
+              </div>
+
+              {/* Community Goal */}
+              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 block">Community Target</span>
+                <div className="font-mono mt-1">
+                  <span className="text-xl font-bold text-neutral-100">${communityGoalUsd}</span>
+                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
+                </div>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Capped community share</span>
+              </div>
+
+              {/* Developer Contribution */}
+              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-300 block">Developer Share</span>
+                <div className="font-mono mt-1">
+                  <span className="text-xl font-bold text-neutral-100">~${devContributionUsd}</span>
+                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{devContributionInr.toLocaleString('en-IN')})</span>
+                </div>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Paid out-of-pocket</span>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed bg-neutral-900/40 p-3.5 rounded-lg border border-[var(--line)]">
+              <strong>Transparent allocation:</strong> The community is not being asked to pay the full device cost. The developer will personally cover the remaining ~${devContributionUsd} (≈ ₹{devContributionInr.toLocaleString('en-IN')}) to secure the device.
+            </p>
+          </div>
         </div>
-
-        {/* 3 Metrics: USD main, bracketed INR */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Total Cost */}
-          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
-            <span className="text-[11px] font-mono uppercase text-neutral-500 block">Total Device Cost</span>
-            <div className="mt-1 font-mono">
-              <span className="text-lg font-bold text-neutral-100">~${devicePriceUsd}</span>
-              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{devicePriceInr.toLocaleString('en-IN')})</span>
-            </div>
-            <span className="text-[11px] text-neutral-500 block mt-1">Retail price with official pen</span>
-          </div>
-
-          {/* Community Goal */}
-          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
-            <span className="text-[11px] font-mono uppercase text-blue-400 block">Community Goal</span>
-            <div className="mt-1 font-mono">
-              <span className="text-lg font-bold text-neutral-100">${communityGoalUsd}</span>
-              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
-            </div>
-            <span className="text-[11px] text-neutral-500 block mt-1">Capped crowdfund target</span>
-          </div>
-
-          {/* Dev Contribution */}
-          <div className="p-3.5 rounded-lg bg-neutral-900/80 border border-neutral-800">
-            <span className="text-[11px] font-mono uppercase text-neutral-400 block">Developer Contribution</span>
-            <div className="mt-1 font-mono">
-              <span className="text-lg font-bold text-neutral-100">~${devContributionUsd}</span>
-              <span className="text-xs text-neutral-400 block sm:inline sm:ml-1.5">(≈ ₹{devContributionInr.toLocaleString('en-IN')})</span>
-            </div>
-            <span className="text-[11px] text-neutral-500 block mt-1">Paid personally out-of-pocket</span>
-          </div>
-        </div>
-
-        {/* Note */}
-        <p className="mt-4 text-xs text-neutral-400 leading-relaxed">
-          The community is not asked to pay the full device cost. The developer will personally cover the remaining ~${devContributionUsd} (≈ ₹{devContributionInr.toLocaleString('en-IN')}).
-        </p>
       </div>
     </section>
   );

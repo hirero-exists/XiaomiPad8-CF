@@ -24,7 +24,7 @@ export const CAMPAIGN_CONFIG = {
   UPI_ID: import.meta.env.VITE_UPI_ID || "developer@upi",
   UPI_NAME: "Xiaomi Pad 8 Dev Fund",
   UPI_QR_IMAGE: import.meta.env.VITE_UPI_QR_URL || "./images/upi-qr-placeholder.svg",
-  INTERNATIONAL_PAYMENT_URL: import.meta.env.VITE_INTERNATIONAL_PAYMENT_URL || "https://tyvm.to/xiaomi-pad-8",
+  INTERNATIONAL_PAYMENT_URL: import.meta.env.VITE_INTERNATIONAL_PAYMENT_URL || "https://www.thankyouverymuch.co/xiaomipad8",
 
   // Milestones: USD primary, INR in brackets
   MILESTONES: [
