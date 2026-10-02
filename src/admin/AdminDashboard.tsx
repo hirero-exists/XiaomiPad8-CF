@@ -10,7 +10,8 @@ import {
   History,
   HelpCircle,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Lock
 } from 'lucide-react';
 import { Donation, CampaignData } from '../lib/types';
 import {
@@ -18,7 +19,8 @@ import {
   approveDonationAction,
   rejectDonationAction,
   updateCampaignSettings,
-  supabase
+  supabase,
+  isSupabaseConfigured
 } from '../lib/supabase';
 import { getLiveRates } from '../lib/exchangeRate';
 
@@ -35,7 +37,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onLogout,
   onBackToSite
 }) => {
-  const [activeTab, setActiveTab] = useState<'pending' | 'campaign' | 'history' | 'setup'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'campaign' | 'history' | 'security' | 'setup'>('pending');
 
   const [pendingList, setPendingList] = useState<Donation[]>([]);
   const [approvedList, setApprovedList] = useState<Donation[]>([]);
@@ -60,6 +62,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
+  // Security / Password update state
+  const [adminEmail, setAdminEmail] = useState('forpayment169@gmail.com');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const [newEmail, setNewEmail] = useState('');
+  const [updatingEmail, setUpdatingEmail] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -72,6 +87,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setRejectedList(donations.rejected);
       setCurrentFxRate(rates.INR);
       setCustomRate(rates.INR.toFixed(2));
+
+      // Get logged-in user email
+      if (supabase && isSupabaseConfigured) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.email) {
+          setAdminEmail(user.email);
+        }
+      }
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -149,6 +172,87 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setUpdatingPassword(true);
+
+    try {
+      if (!isSupabaseConfigured || !supabase) {
+        // Mock preview
+        setPasswordSuccess('Password updated successfully (preview mode).');
+        setNewPassword('');
+        setConfirmPassword('');
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        setPasswordError(error.message);
+      } else {
+        setPasswordSuccess('Password updated successfully! Use your new password on next login.');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch {
+      setPasswordError('Failed to update password. Please try again.');
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
+  const handleEmailUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError(null);
+    setEmailSuccess(null);
+
+    if (!newEmail.trim() || !newEmail.includes('@')) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    }
+
+    setUpdatingEmail(true);
+
+    try {
+      if (!isSupabaseConfigured || !supabase) {
+        setAdminEmail(newEmail.trim());
+        setEmailSuccess('Email updated successfully (preview mode).');
+        setNewEmail('');
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail.trim(),
+      });
+
+      if (error) {
+        setEmailError(error.message);
+      } else {
+        setEmailSuccess('Email update initiated. A confirmation link has been sent to your new email.');
+        setNewEmail('');
+      }
+    } catch {
+      setEmailError('Failed to update email. Please try again.');
+    } finally {
+      setUpdatingEmail(false);
+    }
+  };
+
   const handleLogoutClick = async () => {
     if (supabase) {
       await supabase.auth.signOut();
@@ -176,8 +280,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ({pendingList.length} pending)
               </span>
             </h1>
-            <p className="text-xs text-neutral-500">
-              Manual verification & locked historical conversion
+            <p className="text-xs text-neutral-500 font-mono">
+              Logged in as: <strong className="text-neutral-300">{adminEmail}</strong>
             </p>
           </div>
         </div>
@@ -239,6 +343,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
+          onClick={() => setActiveTab('security')}
+          className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
+            activeTab === 'security'
+              ? 'bg-neutral-800 text-white'
+              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+          }`}
+        >
+          <Lock className="w-3.5 h-3.5" />
+          <span>Account & Password</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('setup')}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
             activeTab === 'setup'
@@ -247,7 +363,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           }`}
         >
           <HelpCircle className="w-3.5 h-3.5" />
-          <span>Setup Guide</span>
+          <span>Hosting Guide</span>
         </button>
       </div>
 
@@ -331,9 +447,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             title="Copy Ref"
                           >
                             {copiedRef === item.payment_reference ? (
-                              <Check className="w-3 h-3 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
                             ) : (
-                              <Copy className="w-3 h-3" />
+                              <Copy className="w-3.5 h-3.5" />
                             )}
                           </button>
                         </div>
@@ -360,9 +476,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors flex items-center gap-1"
                         >
                           {actionLoadingId === item.id ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           ) : (
-                            <Check className="w-3 h-3" />
+                            <Check className="w-3.5 h-3.5" />
                           )}
                           <span>Approve & Lock</span>
                         </button>
@@ -373,7 +489,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => handleReject(item.id)}
                           className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-mono text-neutral-400 hover:text-red-400 transition-colors"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -469,7 +585,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">Payment Gateway URL</label>
+              <label className="block text-neutral-400 mb-1 font-mono">International Payment URL (ThankYouVeryMuch)</label>
               <input
                 type="url"
                 value={paymentUrl}
@@ -540,38 +656,149 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* ========================================================= */}
-      {/* SETUP GUIDE TAB                                           */}
+      {/* SECURITY / ACCOUNT MANAGEMENT TAB                         */}
+      {/* ========================================================= */}
+      {activeTab === 'security' && (
+        <div className="max-w-xl space-y-6">
+          {/* Change Password Card */}
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-neutral-100 mb-1 flex items-center gap-1.5">
+              <Lock className="w-4 h-4 text-blue-400" />
+              <span>Change Admin Password</span>
+            </h2>
+            <p className="text-xs text-[var(--muted)] mb-4">
+              Update your password. Takes effect immediately for your Supabase account.
+            </p>
+
+            {passwordSuccess && (
+              <div className="mb-4 p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono text-emerald-300">
+                ✓ {passwordSuccess}
+              </div>
+            )}
+
+            {passwordError && (
+              <div className="mb-4 p-2.5 rounded bg-red-950/40 border border-red-500/30 text-xs font-mono text-red-300">
+                ✕ {passwordError}
+              </div>
+            )}
+
+            <form onSubmit={handlePasswordUpdate} className="space-y-3.5 text-xs font-mono">
+              <div>
+                <label className="block text-neutral-400 mb-1">New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min 6 chars)"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-neutral-400 mb-1">Confirm New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={updatingPassword}
+                className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-medium text-white transition-colors"
+              >
+                {updatingPassword ? 'Updating Password...' : 'Update Password'}
+              </button>
+            </form>
+          </div>
+
+          {/* Change Email Card */}
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-neutral-100 mb-1">
+              Change Admin Email
+            </h2>
+            <p className="text-xs text-[var(--muted)] mb-4">
+              Current email: <strong className="text-neutral-200">{adminEmail}</strong>
+            </p>
+
+            {emailSuccess && (
+              <div className="mb-4 p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono text-emerald-300">
+                ✓ {emailSuccess}
+              </div>
+            )}
+
+            {emailError && (
+              <div className="mb-4 p-2.5 rounded bg-red-950/40 border border-red-500/30 text-xs font-mono text-red-300">
+                ✕ {emailError}
+              </div>
+            )}
+
+            <form onSubmit={handleEmailUpdate} className="space-y-3.5 text-xs font-mono">
+              <div>
+                <label className="block text-neutral-400 mb-1">New Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="new-email@example.com"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={updatingEmail}
+                className="w-full py-2 px-4 rounded-lg border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-900 text-xs font-medium text-neutral-200 transition-colors"
+              >
+                {updatingEmail ? 'Updating Email...' : 'Update Email'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* HOSTING GUIDE TAB                                         */}
       {/* ========================================================= */}
       {activeTab === 'setup' && (
         <div className="max-w-2xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 text-xs text-neutral-300 space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-100">Simple Supabase Setup (3 Minutes)</h2>
+          <h2 className="text-sm font-semibold text-neutral-100">Hosting on GitHub Pages (Free)</h2>
 
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">1. Create Supabase Project</strong>
+              <strong className="text-neutral-100 block mb-1">1. Push to GitHub</strong>
               <p className="text-neutral-400">
-                Go to <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">supabase.com</a>, log in with GitHub, and click <strong>New Project</strong>. Choose a name and password.
+                Create a new repository on GitHub (e.g. <code className="text-neutral-200">xiaomi-pad-8-crowdfunding</code>) and push this folder:
+                <br /><code className="text-neutral-200 select-all block mt-1 bg-neutral-900 p-1.5 rounded">git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git && git push -u origin main</code>
               </p>
             </div>
 
             <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">2. Paste SQL Script</strong>
+              <strong className="text-neutral-100 block mb-1">2. Enable GitHub Pages</strong>
               <p className="text-neutral-400">
-                In Supabase, click <strong>SQL Editor</strong> &gt; <strong>New Query</strong>. Copy the entire contents of <code className="text-neutral-200">supabase/schema.sql</code> and click <strong>Run</strong>.
+                In your GitHub repo: Go to <strong>Settings</strong> &gt; <strong>Pages</strong>. Under <strong>Build and deployment &gt; Source</strong>, choose <strong>GitHub Actions</strong>.
               </p>
             </div>
 
             <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">3. Create Admin Login</strong>
+              <strong className="text-neutral-100 block mb-1">3. Add Supabase Secrets to GitHub</strong>
               <p className="text-neutral-400">
-                Go to <strong>Authentication</strong> &gt; <strong>Users</strong> &gt; <strong>Add user</strong> &gt; <strong>Create user</strong>. Enter your email and a password, and toggle <strong>Auto Confirm User</strong> to ON.
+                In GitHub: Go to <strong>Settings</strong> &gt; <strong>Secrets and variables</strong> &gt; <strong>Actions</strong> &gt; <strong>New repository secret</strong>:
+                <br />• <code className="text-neutral-200">VITE_SUPABASE_URL</code>: your Supabase Project URL
+                <br />• <code className="text-neutral-200">VITE_SUPABASE_ANON_KEY</code>: your Supabase anon public key
               </p>
             </div>
 
             <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">4. Copy Keys to .env</strong>
+              <strong className="text-neutral-100 block mb-1">4. Automatic Deployment</strong>
               <p className="text-neutral-400">
-                Go to <strong>Project Settings</strong> &gt; <strong>API</strong>. Copy <strong>Project URL</strong> and <strong>anon key</strong> into your <code className="text-neutral-200">.env</code> file.
+                GitHub Actions will automatically run the build and publish your website to <code className="text-neutral-200">https://YOUR_USER.github.io/YOUR_REPO/</code>!
               </p>
             </div>
           </div>

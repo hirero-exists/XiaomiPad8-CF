@@ -129,7 +129,7 @@ export const CAMPAIGN_CONFIG = {
   DEVICE_NAME: "Xiaomi Pad 8",
   DEVICE_SPECS: "12GB RAM + 256GB Storage + Xiaomi Pen",
   UPI_ID: "yourname@upi",
-  INTERNATIONAL_PAYMENT_URL: "https://tyvm.to/your-link",
+  INTERNATIONAL_PAYMENT_URL: "https://www.thankyouverymuch.co/xiaomipad8",
   // ...
 };
 ```

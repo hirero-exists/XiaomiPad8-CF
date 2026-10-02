@@ -6,7 +6,7 @@
 -- 1. Create campaign table
 CREATE TABLE IF NOT EXISTS public.campaign (
     id TEXT PRIMARY KEY DEFAULT 'xiaomi_pad_8',
-    usd_goal NUMERIC NOT NULL DEFAULT 350.00,
+    usd_goal NUMERIC NOT NULL DEFAULT 370.00,
     device_price_inr NUMERIC NOT NULL DEFAULT 52000.00,
     fundraising_enabled BOOLEAN NOT NULL DEFAULT true,
     campaign_status TEXT NOT NULL DEFAULT 'fundraising' CHECK (campaign_status IN ('interest', 'fundraising', 'goal_reached', 'refunds', 'completed')),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.campaign (
 
 -- Seed initial campaign record if empty
 INSERT INTO public.campaign (id, usd_goal, device_price_inr, fundraising_enabled, campaign_status, payment_url, upi_id, purchase_status)
-VALUES ('xiaomi_pad_8', 350.00, 52000.00, true, 'fundraising', 'https://www.thankyouverymuch.co/xiaomipad8', 'developer@upi', 'pending')
+VALUES ('xiaomi_pad_8', 370.00, 52000.00, true, 'fundraising', 'https://www.thankyouverymuch.co/xiaomipad8', 'developer@upi', 'pending')
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Create donations table
@@ -134,3 +134,17 @@ $$;
 -- Grant execute permissions to anon and authenticated
 GRANT EXECUTE ON FUNCTION public.get_funding_summary() TO anon, authenticated;
 GRANT SELECT ON public.public_donations TO anon, authenticated;
+
+-- ==============================================================================
+-- 8. Admin User Setup (Email & Password)
+-- ==============================================================================
+-- You can create your admin user directly in the Supabase Dashboard:
+-- 1. Go to "Authentication" -> "Users" on the left menu.
+-- 2. Click "Add user" -> "Create user".
+-- 3. Email: forpayment169@gmail.com
+--    Password: KAZUOAexists765!
+-- 4. Check "Auto Confirm User?" -> ON.
+-- 5. Click "Create user".
+--
+-- You can change your password anytime directly from the /#/admin dashboard!
+-- ==============================================================================
