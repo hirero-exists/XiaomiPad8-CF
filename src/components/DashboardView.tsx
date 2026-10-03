@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PublicDonation, FundingSummary, CampaignData } from '../lib/types';
 import { ChevronDown, ArrowLeft } from 'lucide-react';
+import { CAMPAIGN_CONFIG } from '../config';
 
 interface DashboardViewProps {
   summary: FundingSummary;
@@ -21,7 +22,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [displayCount, setDisplayCount] = useState(15);
 
-  const usdGoal = campaign.usd_goal || 350;
+  const usdGoal = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
   const inrGoal = Math.round(usdGoal * fxRate);
   const usdRaised = summary.total_usd_raised;
   const inrRaised = summary.total_inr_raised;

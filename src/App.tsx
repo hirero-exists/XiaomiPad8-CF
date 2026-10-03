@@ -127,7 +127,7 @@ export function App() {
   }, [loadData]);
 
   const isGoalReached =
-    summary.total_usd_raised >= (campaign.usd_goal || 350) ||
+    summary.total_usd_raised >= (campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD) ||
     campaign.campaign_status === 'goal_reached';
 
   return (

@@ -17,7 +17,7 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const [animatedWidth, setAnimatedWidth] = useState(0);
 
-  const usdGoal = campaign.usd_goal || 350;
+  const usdGoal = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
   const inrGoal = Math.round(usdGoal * fxRate);
 
   const usdRaised = summary.total_usd_raised;
@@ -83,7 +83,7 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           <div className="sm:border-r border-[var(--line)] px-3 sm:px-5 py-4 sm:py-5">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">goal</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">final goal</span>
             <div className="font-mono mt-1">
               <span className="text-xl sm:text-3xl font-bold text-neutral-100">${usdGoal}</span>
               <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{inrGoal.toLocaleString('en-IN')})</span>
@@ -111,19 +111,108 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
         </div>
 
-        {/* Minimal Terminal-Style Progress Bar */}
-        <div className="mt-6">
-          <div className="flex justify-between font-mono text-xs text-[var(--muted)] mb-2">
-            <span>{percentage}% FUNDED</span>
-            <span>{isGoalReached ? 'GOAL COMPLETED 🎉' : `$${remainingUsd} TO GO`}</span>
+        {/* Minimal Terminal-Style Progress Bar with Milestone Markers */}
+        <div className="mt-8">
+          <div className="flex flex-wrap items-center justify-between font-mono text-xs text-[var(--muted)] mb-2.5 gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-100 font-bold">{percentage}% FUNDED</span>
+              {percentage >= 100 ? (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  ALL TIERS MET 🎉
+                </span>
+              ) : percentage >= 85.7 ? (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  TIER 2 MET (+STYLUS)
+                </span>
+              ) : percentage >= 71.4 ? (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  TIER 1 MET (BASE)
+                </span>
+              ) : (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                  NEXT: TIER 1 @ 71.4%
+                </span>
+              )}
+            </div>
+            <span>{isGoalReached ? 'FINAL TARGET REACHED 🎉' : `$${remainingUsd} TO FINAL GOAL`}</span>
           </div>
-          <div className="h-3 border border-neutral-700 bg-neutral-950 p-0.5 rounded-sm overflow-hidden">
+
+          {/* Progress Bar Track with Notch Dividers */}
+          <div className="relative h-4 sm:h-5 border border-neutral-700 bg-neutral-950 p-0.5 rounded-sm overflow-hidden">
+            {/* Animated Fill Bar */}
             <div
               className={`h-full transition-all duration-700 ease-out ${
                 isGoalReached ? 'bg-emerald-400' : 'bg-neutral-100'
               }`}
               style={{ width: `${animatedWidth}%` }}
             />
+
+            {/* Milestone 1 Notch: 71.4% (₹25k) */}
+            <div
+              className="absolute top-0 bottom-0 w-[2px] z-10 pointer-events-none"
+              style={{ left: '71.4%' }}
+              title="Tier 1: 71.4% (₹25k Base Variant)"
+            >
+              <div className={`h-full w-full ${animatedWidth >= 71.4 ? 'bg-neutral-900/90' : 'bg-neutral-500/70'}`} />
+            </div>
+
+            {/* Milestone 2 Notch: 85.7% (₹30k) */}
+            <div
+              className="absolute top-0 bottom-0 w-[2px] z-10 pointer-events-none"
+              style={{ left: '85.7%' }}
+              title="Tier 2: 85.7% (₹30k Upgraded / Stylus)"
+            >
+              <div className={`h-full w-full ${animatedWidth >= 85.7 ? 'bg-neutral-900/90' : 'bg-neutral-500/70'}`} />
+            </div>
+          </div>
+
+          {/* Milestone Indicators Under The Bar */}
+          <div className="relative w-full h-12 sm:h-14 mt-2 font-mono text-[11px] select-none">
+            {/* 0% Start */}
+            <div className="absolute top-0 left-0 flex flex-col items-start text-neutral-600">
+              <span className="text-[10px] leading-none mb-1">▲</span>
+              <span className="text-[10px] font-semibold text-neutral-500">$0</span>
+              <span className="text-[9px] text-neutral-600">Start</span>
+            </div>
+
+            {/* Milestone 1: 71.4% (₹25k) */}
+            <div
+              className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
+              style={{ left: '71.4%' }}
+            >
+              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 71.4 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
+              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 71.4 ? 'text-blue-400' : 'text-neutral-300'}`}>
+                71.4%
+              </span>
+              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
+                ₹25k <span className="hidden sm:inline">• Base</span>
+              </span>
+            </div>
+
+            {/* Milestone 2: 85.7% (₹30k) */}
+            <div
+              className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
+              style={{ left: '85.7%' }}
+            >
+              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 85.7 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
+              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 85.7 ? 'text-blue-400' : 'text-neutral-300'}`}>
+                85.7%
+              </span>
+              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
+                ₹30k <span className="hidden sm:inline">• +Stylus</span>
+              </span>
+            </div>
+
+            {/* Final Goal: 100% (₹35k) */}
+            <div className="absolute top-0 right-0 flex flex-col items-end transition-colors">
+              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 100 ? 'text-emerald-400 font-bold' : 'text-neutral-500'}`}>▲</span>
+              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 100 ? 'text-emerald-400' : 'text-neutral-200'}`}>
+                100% FINAL
+              </span>
+              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
+                ₹35k <span className="hidden sm:inline">• Keybd+Pen</span>
+              </span>
+            </div>
           </div>
         </div>
 

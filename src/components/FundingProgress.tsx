@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FundingSummary, CampaignData } from '../lib/types';
+import { CAMPAIGN_CONFIG } from '../config';
 
 interface FundingProgressProps {
   summary: FundingSummary;
@@ -10,7 +11,7 @@ interface FundingProgressProps {
 export const FundingProgress: React.FC<FundingProgressProps> = ({ summary, campaign, fxRate }) => {
   const [animatedWidth, setAnimatedWidth] = useState(0);
 
-  const usdGoal = campaign.usd_goal || 350;
+  const usdGoal = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
   const inrGoal = Math.round(usdGoal * fxRate);
 
   const usdRaised = summary.total_usd_raised;
