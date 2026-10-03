@@ -71,17 +71,54 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
             </div>
 
             {/* Note explaining the variants and the developer promise */}
-            <div className="text-xs sm:text-sm text-neutral-300 leading-relaxed bg-neutral-900/40 p-4 rounded-lg border border-[var(--line)] space-y-2.5">
-              <p className="font-medium text-neutral-200">
-                Tiered hardware allocation:
-              </p>
-              <ul className="list-disc list-inside space-y-1.5 text-neutral-400 text-xs font-mono">
-                <li><strong className="text-neutral-200">Tier 1 (₹25,000 / 71.4%):</strong> Base Xiaomi Pad 8 variant for ROM and kernel bring-up.</li>
-                <li><strong className="text-neutral-200">Tier 2 (₹30,000 / 85.7%):</strong> Higher RAM/Storage variant or official Stylus Pen for input testing.</li>
-                <li><strong className="text-neutral-200">Tier 3 (₹35,000 / 100% Final):</strong> Top-tier variant + official Keyboard & Stylus accessories for complete ecosystem HALs.</li>
-              </ul>
-              <p className="pt-2.5 border-t border-neutral-800 text-neutral-400 text-xs">
-                <strong>Developer commitment:</strong> Once the goal is reached, the developer will cover the rest personally — including any remaining hardware balance, local import duties, customs, and shipping costs.
+            <div className="text-xs sm:text-sm text-neutral-300 leading-relaxed bg-neutral-900/40 p-5 rounded-lg border border-[var(--line)] space-y-4">
+              <div>
+                <span className="font-mono text-[10px] text-blue-400 uppercase tracking-wider block mb-1">CO-FUNDING TRANSPARENCY</span>
+                <p className="font-semibold text-neutral-100 text-sm">
+                  How community goals and developer co-funding work:
+                </p>
+                <p className="text-neutral-400 text-xs mt-1">
+                  The community is only asked to fund a base contribution. Whichever milestone tier is reached, the developer personally pays the rest out-of-pocket:
+                </p>
+              </div>
+
+              <div className="space-y-3 font-mono text-xs">
+                {/* Tier 1 */}
+                <div className="p-3.5 rounded bg-neutral-950/80 border border-[var(--line)]">
+                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                    <span className="text-blue-400 font-bold">Tier 1 Goal: $290 (≈ ₹25,000) // 71.4%</span>
+                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$440 (≈ ₹38,000)</span>
+                  </div>
+                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
+                    If <strong>$290 (≈ ₹25,000)</strong> is reached, as the base tablet costs <strong>~$440 (≈ ₹38,000)</strong>, the developer will cover the rest personally to purchase the base variant for core kernel patching, device-tree bring-up, and custom ROM development.
+                  </p>
+                </div>
+
+                {/* Tier 2 */}
+                <div className="p-3.5 rounded bg-neutral-950/80 border border-[var(--line)]">
+                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                    <span className="text-blue-400 font-bold">Tier 2 Goal: $345 (≈ ₹30,000) // 85.7%</span>
+                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$510 (≈ ₹44,000)</span>
+                  </div>
+                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
+                    If <strong>$345 (≈ ₹30,000)</strong> is reached, as the upgraded variant or tablet + official stylus package costs <strong>~$510 (≈ ₹44,000)</strong>, the developer will cover the rest personally for pressure sensitivity & input HAL testing.
+                  </p>
+                </div>
+
+                {/* Tier 3 */}
+                <div className="p-3.5 rounded bg-neutral-950/80 border border-blue-500/30 bg-blue-950/10">
+                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                    <span className="text-emerald-400 font-bold">Tier 3 Final Goal: $400 (≈ ₹35,000) // 100%</span>
+                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$600 (≈ ₹52,000)</span>
+                  </div>
+                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
+                    Same applies if <strong>$400 (≈ ₹35,000)</strong> is reached: as the highest variant + full official magnetic keyboard & stylus accessories costs <strong>~$600 (≈ ₹52,000)</strong>, the developer will cover the rest personally to test desktop workstation mode and full ecosystem HALs.
+                  </p>
+                </div>
+              </div>
+
+              <p className="pt-3 border-t border-neutral-800 text-neutral-400 text-xs">
+                <strong>Developer guarantee:</strong> Once the community funding goal is reached, the developer covers all remaining device cost, local import taxes, customs duties, and shipping out-of-pocket.
               </p>
             </div>
           </div>

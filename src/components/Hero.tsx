@@ -175,42 +175,47 @@ export const Hero: React.FC<HeroProps> = ({
               <span className="text-[9px] text-neutral-600">Start</span>
             </div>
 
-            {/* Milestone 1: 71.4% (₹25k) */}
+            {/* Milestone 1: 71.4% ($290 / ₹25k) */}
             <div
               className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
               style={{ left: '71.4%' }}
+              title="Tier 1: $290 (≈ ₹25,000) - Base Variant (Retail ~$440 / ₹38,000, Dev covers rest)"
             >
               <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 71.4 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
               <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 71.4 ? 'text-blue-400' : 'text-neutral-300'}`}>
                 71.4%
               </span>
               <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                ₹25k <span className="hidden sm:inline">• Base</span>
+                $290 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹25k)</span> <span className="hidden sm:inline">• Base</span>
               </span>
             </div>
 
-            {/* Milestone 2: 85.7% (₹30k) */}
+            {/* Milestone 2: 85.7% ($345 / ₹30k) */}
             <div
               className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
               style={{ left: '85.7%' }}
+              title="Tier 2: $345 (≈ ₹30,000) - Upgraded / Stylus (Retail ~$510 / ₹44,000, Dev covers rest)"
             >
               <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 85.7 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
               <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 85.7 ? 'text-blue-400' : 'text-neutral-300'}`}>
                 85.7%
               </span>
               <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                ₹30k <span className="hidden sm:inline">• +Stylus</span>
+                $345 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹30k)</span> <span className="hidden sm:inline">• +Stylus</span>
               </span>
             </div>
 
-            {/* Final Goal: 100% (₹35k) */}
-            <div className="absolute top-0 right-0 flex flex-col items-end transition-colors">
+            {/* Final Goal: 100% ($400 / ₹35k) */}
+            <div
+              className="absolute top-0 right-0 flex flex-col items-end transition-colors"
+              title="Tier 3 (Final): $400 (≈ ₹35,000) - Top Variant + Keyboard & Pen (Retail ~$600 / ₹52,000, Dev covers rest)"
+            >
               <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 100 ? 'text-emerald-400 font-bold' : 'text-neutral-500'}`}>▲</span>
               <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 100 ? 'text-emerald-400' : 'text-neutral-200'}`}>
                 100% FINAL
               </span>
               <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                ₹35k <span className="hidden sm:inline">• Keybd+Pen</span>
+                $400 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹35k)</span> <span className="hidden sm:inline">• Keybd+Pen</span>
               </span>
             </div>
           </div>

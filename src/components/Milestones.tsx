@@ -76,6 +76,12 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                         </span>
                       </div>
 
+                      {/* Retail device cost & dev share note */}
+                      <div className="mt-2 py-1 px-2 rounded bg-neutral-950/80 border border-neutral-800 text-[10px]">
+                        <span className="text-neutral-400 block font-mono">Retail: ~${m.deviceCostUsdApprox} (≈ ₹{m.deviceCostInr.toLocaleString('en-IN')})</span>
+                        <span className="text-emerald-400 font-sans font-medium block mt-0.5">Dev covers the rest</span>
+                      </div>
+
                       {/* Title */}
                       <div className="mt-3">
                         <span className="text-xs font-bold text-neutral-200 block">

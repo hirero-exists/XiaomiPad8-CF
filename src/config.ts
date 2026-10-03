@@ -10,6 +10,8 @@ export interface Milestone {
   title: string;
   description: string;
   hardware: string;
+  deviceCostUsdApprox: number;
+  deviceCostInr: number;
   isFinal?: boolean;
 }
 
@@ -32,7 +34,7 @@ export const CAMPAIGN_CONFIG = {
   UPI_QR_IMAGE: import.meta.env.VITE_UPI_QR_URL || "./images/upi-qr.png",
   INTERNATIONAL_PAYMENT_URL: import.meta.env.VITE_INTERNATIONAL_PAYMENT_URL || "https://www.thankyouverymuch.co/xiaomipad8",
 
-  // 3 Milestones: 25k (71.4%), 30k (85.7%), 35k (100% Final)
+  // 3 Milestones: $290 (≈ ₹25k, 71.4%), $345 (≈ ₹30k, 85.7%), $400 (≈ ₹35k, 100% Final)
   MILESTONES: [
     {
       id: 'm1',
@@ -43,7 +45,9 @@ export const CAMPAIGN_CONFIG = {
       tierName: "Tier 1",
       title: "Base Pad 8 Variant",
       hardware: "Base Variant Tablet",
-      description: "Base variant for core kernel patching, device tree setup, and initial custom ROM bring-up.",
+      deviceCostUsdApprox: 440,
+      deviceCostInr: 38000,
+      description: "If $290 (≈ ₹25,000) is reached, as the base tablet costs ~$440 (≈ ₹38,000), the developer will cover the rest personally to begin kernel & custom ROM bring-up.",
     },
     {
       id: 'm2',
@@ -53,8 +57,10 @@ export const CAMPAIGN_CONFIG = {
       label: "$345 (≈ ₹30,000)",
       tierName: "Tier 2",
       title: "Higher Variant / Stylus",
-      hardware: "Upgraded Variant OR Official Stylus Pen",
-      description: "Higher RAM/storage variant or official stylus pen for pressure sensitivity & input HAL testing.",
+      hardware: "Upgraded Spec OR Official Stylus Pen",
+      deviceCostUsdApprox: 510,
+      deviceCostInr: 44000,
+      description: "If $345 (≈ ₹30,000) is reached, as the upgraded variant or stylus package costs ~$510 (≈ ₹44,000), the developer will cover the rest personally for low-latency input HAL testing.",
     },
     {
       id: 'm3',
@@ -65,7 +71,9 @@ export const CAMPAIGN_CONFIG = {
       tierName: "Final Goal",
       title: "Top Variant + Full Accessories",
       hardware: "Top-Tier Spec + Keyboard + Stylus Pen",
-      description: "Top spec Pad 8 with official magnetic keyboard and stylus pen for complete desktop HAL & ecosystem testing.",
+      deviceCostUsdApprox: 600,
+      deviceCostInr: 52000,
+      description: "If $400 (≈ ₹35,000) is reached, as the highest variant + full keyboard & pen accessories costs ~$600 (≈ ₹52,000), the developer will cover the rest personally for complete workstation mode.",
       isFinal: true,
     },
   ] as Milestone[],
