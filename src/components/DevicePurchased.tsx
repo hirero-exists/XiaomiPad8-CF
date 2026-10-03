@@ -78,7 +78,7 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
                   Complete Device Package: Tablet + Official Stylus
                 </p>
                 <p className="text-neutral-400 text-xs mt-1">
-                  The goal is strictly capped at $290 (≈ ₹25,000). The developer personally covers all remaining costs out-of-pocket:
+                  The goal is strictly capped at $260 (≈ ₹25,000). The developer personally covers all remaining costs out-of-pocket:
                 </p>
               </div>
 
@@ -90,7 +90,7 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
                     <span className="text-[11px] text-neutral-400">Retail: ~$440 (≈ ₹38,000)</span>
                   </div>
                   <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    The base Xiaomi Pad 8 tablet retails for <strong>~$440 (≈ ₹38,000)</strong>. The community is only asked to contribute <strong>$290 (≈ ₹25,000)</strong>. The developer will personally cover the remaining <strong>~$150 (≈ ₹13,000)</strong> out-of-pocket.
+                    The base Xiaomi Pad 8 tablet retails for <strong>~$440 (≈ ₹38,000)</strong>. The community is only asked to contribute <strong>$260 (≈ ₹25,000)</strong>. The developer will personally cover the remaining <strong>~$180 (≈ ₹13,000)</strong> out-of-pocket.
                   </p>
                 </div>
 
@@ -112,13 +112,13 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
                     <span className="text-[11px] text-blue-400 font-semibold">Total: ~$510 (≈ ₹44,000)</span>
                   </div>
                   <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    Total cost of the tablet and pen comes to <strong>~$510 (≈ ₹44,000)</strong>. The community funds <strong>$290 (≈ ₹25,000)</strong>, and the developer personally pays the remaining <strong>~$220 (≈ ₹19,000)</strong> balance plus all local import taxes, customs duties, and shipping fees.
+                    Total cost of the tablet and pen comes to <strong>~$510 (≈ ₹44,000)</strong>. The community funds <strong>$260 (≈ ₹25,000)</strong>, and the developer personally pays the remaining <strong>~$250 (≈ ₹19,000)</strong> balance plus all local import taxes, customs duties, and shipping fees.
                   </p>
                 </div>
               </div>
 
               <p className="pt-3 border-t border-neutral-800 text-neutral-400 text-xs">
-                <strong>Developer guarantee:</strong> Once the $290 (≈ ₹25,000) community goal is reached, the developer covers the rest personally and orders the hardware immediately to commence bring-up.
+                <strong>Developer guarantee:</strong> Once the $260 (≈ ₹25,000) community goal is reached, the developer covers the rest personally and orders the hardware immediately to commence bring-up.
               </p>
             </div>
           </div>

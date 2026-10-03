@@ -56,7 +56,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
 
                   <div className="mt-1">
                     <span className="text-xl font-bold text-neutral-100">
-                      $290
+                      $260
                     </span>
                     <span className="text-xs text-[var(--muted)] block">
                       (≈ ₹25,000)
@@ -65,7 +65,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
 
                   <div className="mt-2 py-1 px-2 rounded bg-neutral-950/80 border border-neutral-800 text-[10px]">
                     <span className="text-neutral-400 block font-mono">Retail Tablet: ~$440 (≈ ₹38,000)</span>
-                    <span className="text-blue-400 font-sans font-medium block mt-0.5">Community Share: 57%</span>
+                    <span className="text-blue-400 font-sans font-medium block mt-0.5">Community Share: ~59%</span>
                   </div>
 
                   <div className="mt-3">
@@ -85,12 +85,12 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                 <div className="mt-4 pt-3 border-t border-neutral-800/80">
                   <div className="flex justify-between text-[10px] text-[var(--muted)] mb-1">
                     <span>Progress</span>
-                    <span>{Math.min(100, Math.round((totalUsdRaised / 290) * 100))}%</span>
+                    <span>{Math.min(100, Math.round((totalUsdRaised / 260) * 100))}%</span>
                   </div>
                   <div className="h-1.5 bg-neutral-800 rounded-full overflow-hidden">
                     <div
                       className="h-full transition-all duration-500 bg-blue-400"
-                      style={{ width: `${Math.min(100, Math.round((totalUsdRaised / 290) * 100))}%` }}
+                      style={{ width: `${Math.min(100, Math.round((totalUsdRaised / 260) * 100))}%` }}
                     />
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                   </div>
 
                   <div className="mt-2 py-1 px-2 rounded bg-neutral-950/80 border border-neutral-800 text-[10px]">
-                    <span className="text-neutral-400 block font-mono">Dev Co-Funding: ~$220 (≈ ₹19,000)</span>
+                    <span className="text-neutral-400 block font-mono">Dev Co-Funding: ~$250 (≈ ₹19,000)</span>
                     <span className="text-neutral-300 font-sans font-medium block mt-0.5">+ Shipping, Taxes & Customs</span>
                   </div>
 
@@ -176,7 +176,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                   </div>
 
                   <p className="mt-2 text-[11px] text-neutral-400 leading-relaxed font-sans">
-                    Once the $290 (≈ ₹25,000) goal is reached, the developer immediately orders both the tablet and stylus to begin active development.
+                    Once the $260 (≈ ₹25,000) goal is reached, the developer immediately orders both the tablet and stylus to begin active development.
                   </p>
                 </div>
 

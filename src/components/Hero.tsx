@@ -88,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({
               <span className="text-xl sm:text-3xl font-bold text-neutral-100">${usdGoal}</span>
               <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{inrGoal.toLocaleString('en-IN')})</span>
             </div>
-            <span className="text-[10px] text-neutral-400 font-mono block mt-1">Dev covers rest (~$220)</span>
+            <span className="text-[10px] text-neutral-400 font-mono block mt-1">Dev covers rest (~$250)</span>
           </div>
 
           <div className="border-t sm:border-t-0 border-r border-[var(--line)] px-3 sm:px-5 py-4 sm:py-5">
@@ -123,7 +123,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </span>
               ) : (
                 <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                  TARGET: $290 (≈ ₹25,000)
+                  TARGET: $260 (≈ ₹25,000)
                 </span>
               )}
             </div>
@@ -163,7 +163,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </span>
               </div>
               <div className="font-bold text-base text-neutral-100">
-                $290 <span className="text-xs text-[var(--muted)] font-normal">(≈ ₹25,000)</span>
+                $260 <span className="text-xs text-[var(--muted)] font-normal">(≈ ₹25,000)</span>
               </div>
               <div className="text-[11px] text-[var(--muted)] mt-1 flex items-center justify-between">
                 <span>Base Tablet Bring-Up Fund</span>
@@ -201,7 +201,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
               <div className="text-[11px] text-[var(--muted)] mt-1 flex items-center justify-between">
                 <span>Tablet + Pen</span>
-                <span className="text-[10px] text-emerald-400">Dev pays ~$220 rest</span>
+                <span className="text-[10px] text-emerald-400">Dev pays ~$250 rest</span>
               </div>
             </div>
           </div>

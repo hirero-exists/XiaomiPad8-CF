@@ -16,8 +16,8 @@ export interface Milestone {
 }
 
 export const CAMPAIGN_CONFIG = {
-  // Single Community Goal: $290 (≈ ₹25,000)
-  COMMUNITY_GOAL_USD: 290,
+  // Single Community Goal: $260 (≈ ₹25,000)
+  COMMUNITY_GOAL_USD: 260,
   COMMUNITY_GOAL_INR: 25000,
 
   // Hardware Details & Online Market Pricing
@@ -36,7 +36,7 @@ export const CAMPAIGN_CONFIG = {
   TOTAL_PACKAGE_INR: 44000, // ₹38,000 tablet + ₹6,000 pen
 
   // Developer Out-of-Pocket Share (Covers remaining tablet + 100% of pen)
-  DEV_COVERED_USD: 220, // $510 - $290
+  DEV_COVERED_USD: 250, // $510 - $260
   DEV_COVERED_INR: 19000, // ₹44,000 - ₹25,000
 
   DEVICE_PRICE_USD_APPROX: 510,
@@ -54,20 +54,20 @@ export const CAMPAIGN_CONFIG = {
   UPI_QR_IMAGE: import.meta.env.VITE_UPI_QR_URL || "./images/upi-qr.png",
   INTERNATIONAL_PAYMENT_URL: import.meta.env.VITE_INTERNATIONAL_PAYMENT_URL || "https://www.thankyouverymuch.co/xiaomipad8",
 
-  // Single Community Milestone ($290 / ₹25,000)
+  // Single Community Milestone ($260 / ₹25,000)
   MILESTONES: [
     {
       id: 'm1',
-      usdTarget: 290,
+      usdTarget: 260,
       inrApprox: 25000,
       percentage: 100,
-      label: "$290 (≈ ₹25,000)",
+      label: "$260 (≈ ₹25,000)",
       tierName: "Community Goal",
       title: "Xiaomi Pad 8 + Focus Pen Pro Bring-Up",
       hardware: "Base Pad 8 ($440) + Focus Pen Pro ($70, Dev Covered)",
       deviceCostUsdApprox: 510,
       deviceCostInr: 44000,
-      description: "Community funds $290 (≈ ₹25,000). The developer personally covers the remaining ~$150 tablet cost + 100% of the Xiaomi Focus Pen Pro (~$70 / ₹6,000) out-of-pocket for complete ROM bring-up and stylus HAL testing.",
+      description: "Community funds $260 (≈ ₹25,000). The developer personally covers the remaining ~$180 tablet cost + 100% of the Xiaomi Focus Pen Pro (~$70 / ₹6,000) out-of-pocket for complete ROM bring-up and stylus HAL testing.",
       isFinal: true,
     }
   ] as Milestone[],
