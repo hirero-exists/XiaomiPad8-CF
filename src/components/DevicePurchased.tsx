@@ -30,17 +30,17 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
 
           <div className="md:col-span-8 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Target Device */}
+              {/* Total Package */}
               <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
                 <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] mb-1">
                   <Cpu className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Target Hardware</span>
+                  <span>Total Hardware Package</span>
                 </div>
                 <div className="font-mono mt-1">
-                  <span className="text-base sm:text-lg font-bold text-neutral-100">{CAMPAIGN_CONFIG.DEVICE_NAME}</span>
-                  <span className="text-xs text-[var(--muted)] block">Snapdragon 8s Gen 3</span>
+                  <span className="text-base sm:text-lg font-bold text-neutral-100">~${CAMPAIGN_CONFIG.TOTAL_PACKAGE_USD}</span>
+                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{CAMPAIGN_CONFIG.TOTAL_PACKAGE_INR.toLocaleString('en-IN')})</span>
                 </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">144Hz 3K Display</span>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Pad 8 ($440) + Pen Pro ($70)</span>
               </div>
 
               {/* Community Goal */}
@@ -53,72 +53,72 @@ export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRa
                   <span className="text-xl font-bold text-neutral-100">${communityGoalUsd}</span>
                   <span className="text-xs text-[var(--muted)] block">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
                 </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">3 tiers: ₹25k, ₹30k, ₹35k</span>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Single community goal</span>
               </div>
 
               {/* Developer Guarantee */}
               <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
                 <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-emerald-400 mb-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Developer Guarantee</span>
+                  <span>Developer Co-Funding</span>
                 </div>
                 <div className="font-mono mt-1">
-                  <span className="text-base sm:text-lg font-bold text-neutral-100">Dev Covers The Rest</span>
-                  <span className="text-xs text-emerald-400/90 block">Once goal is reached</span>
+                  <span className="text-base sm:text-lg font-bold text-neutral-100">~${CAMPAIGN_CONFIG.DEV_COVERED_USD}</span>
+                  <span className="text-xs text-emerald-400/90 block">(≈ ₹{CAMPAIGN_CONFIG.DEV_COVERED_INR.toLocaleString('en-IN')})</span>
                 </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">Shipping, taxes & balance</span>
+                <span className="text-[11px] text-[var(--muted)] block mt-2">Dev covers pen + rest</span>
               </div>
             </div>
 
             {/* Note explaining the variants and the developer promise */}
             <div className="text-xs sm:text-sm text-neutral-300 leading-relaxed bg-neutral-900/40 p-5 rounded-lg border border-[var(--line)] space-y-4">
               <div>
-                <span className="font-mono text-[10px] text-blue-400 uppercase tracking-wider block mb-1">CO-FUNDING TRANSPARENCY</span>
+                <span className="font-mono text-[10px] text-blue-400 uppercase tracking-wider block mb-1">HARDWARE ALLOCATION & CO-FUNDING</span>
                 <p className="font-semibold text-neutral-100 text-sm">
-                  How community goals and developer co-funding work:
+                  Complete Device Package: Tablet + Official Stylus
                 </p>
                 <p className="text-neutral-400 text-xs mt-1">
-                  The community is only asked to fund a base contribution. Whichever milestone tier is reached, the developer personally pays the rest out-of-pocket:
+                  The goal is strictly capped at $290 (≈ ₹25,000). The developer personally covers all remaining costs out-of-pocket:
                 </p>
               </div>
 
               <div className="space-y-3 font-mono text-xs">
-                {/* Tier 1 */}
+                {/* Tablet Allocation */}
                 <div className="p-3.5 rounded bg-neutral-950/80 border border-[var(--line)]">
                   <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-blue-400 font-bold">Tier 1 Goal: $290 (≈ ₹25,000) // 71.4%</span>
-                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$440 (≈ ₹38,000)</span>
+                    <span className="text-blue-400 font-bold">01 // Xiaomi Pad 8 (Base Variant)</span>
+                    <span className="text-[11px] text-neutral-400">Retail: ~$440 (≈ ₹38,000)</span>
                   </div>
                   <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    If <strong>$290 (≈ ₹25,000)</strong> is reached, as the base tablet costs <strong>~$440 (≈ ₹38,000)</strong>, the developer will cover the rest personally to purchase the base variant for core kernel patching, device-tree bring-up, and custom ROM development.
+                    The base Xiaomi Pad 8 tablet retails for <strong>~$440 (≈ ₹38,000)</strong>. The community is only asked to contribute <strong>$290 (≈ ₹25,000)</strong>. The developer will personally cover the remaining <strong>~$150 (≈ ₹13,000)</strong> out-of-pocket.
                   </p>
                 </div>
 
-                {/* Tier 2 */}
-                <div className="p-3.5 rounded bg-neutral-950/80 border border-[var(--line)]">
+                {/* Pen Allocation */}
+                <div className="p-3.5 rounded bg-neutral-950/80 border border-emerald-500/30 bg-emerald-950/10">
                   <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-blue-400 font-bold">Tier 2 Goal: $345 (≈ ₹30,000) // 85.7%</span>
-                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$510 (≈ ₹44,000)</span>
+                    <span className="text-emerald-400 font-bold">02 // Xiaomi Focus Pen Pro</span>
+                    <span className="text-[11px] text-emerald-400 font-semibold">Retail: ~$70 (≈ ₹6,000) • 100% DEV COVERED</span>
                   </div>
                   <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    If <strong>$345 (≈ ₹30,000)</strong> is reached, as the upgraded variant or tablet + official stylus package costs <strong>~$510 (≈ ₹44,000)</strong>, the developer will cover the rest personally for pressure sensitivity & input HAL testing.
+                    The official <strong>Xiaomi Focus Pen Pro</strong> retails online for approximately <strong>₹5,499 - ₹5,999 (~$70 USD)</strong> (featuring 16,384 levels of pressure sensitivity, active haptics, and &lt;1ms low-latency). <strong>The developer is covering 100% of the stylus cost personally</strong> ($0 from community funds) to ensure stylus HAL and palm-rejection can be fully tested on custom ROMs.
                   </p>
                 </div>
 
-                {/* Tier 3 */}
-                <div className="p-3.5 rounded bg-neutral-950/80 border border-blue-500/30 bg-blue-950/10">
+                {/* Final Total Summary */}
+                <div className="p-3.5 rounded bg-neutral-950/80 border border-blue-500/30">
                   <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-emerald-400 font-bold">Tier 3 Final Goal: $400 (≈ ₹35,000) // 100%</span>
-                    <span className="text-[11px] text-neutral-400">Retail Cost: ~$600 (≈ ₹52,000)</span>
+                    <span className="text-neutral-200 font-bold">03 // Total Hardware Cost & Dev Commitment</span>
+                    <span className="text-[11px] text-blue-400 font-semibold">Total: ~$510 (≈ ₹44,000)</span>
                   </div>
                   <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    Same applies if <strong>$400 (≈ ₹35,000)</strong> is reached: as the highest variant + full official magnetic keyboard & stylus accessories costs <strong>~$600 (≈ ₹52,000)</strong>, the developer will cover the rest personally to test desktop workstation mode and full ecosystem HALs.
+                    Total cost of the tablet and pen comes to <strong>~$510 (≈ ₹44,000)</strong>. The community funds <strong>$290 (≈ ₹25,000)</strong>, and the developer personally pays the remaining <strong>~$220 (≈ ₹19,000)</strong> balance plus all local import taxes, customs duties, and shipping fees.
                   </p>
                 </div>
               </div>
 
               <p className="pt-3 border-t border-neutral-800 text-neutral-400 text-xs">
-                <strong>Developer guarantee:</strong> Once the community funding goal is reached, the developer covers all remaining device cost, local import taxes, customs duties, and shipping out-of-pocket.
+                <strong>Developer guarantee:</strong> Once the $290 (≈ ₹25,000) community goal is reached, the developer covers the rest personally and orders the hardware immediately to commence bring-up.
               </p>
             </div>
           </div>

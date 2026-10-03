@@ -54,7 +54,7 @@ export const DonationMethods: React.FC<DonationMethodsProps> = ({
               ● STATUS: GOAL COMPLETED
             </span>
             <p className="text-xs text-neutral-400 leading-relaxed">
-              The community target of ${campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD} has been fully funded. Contributions are currently closed. The developer will cover the rest personally.
+              The community target of ${campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD} (≈ ₹{CAMPAIGN_CONFIG.COMMUNITY_GOAL_INR.toLocaleString('en-IN')}) has been fully funded. Contributions are currently closed. The developer will cover the rest personally.
             </p>
             {campaign.purchase_status !== 'pending' && (
               <div className="mt-2.5 pt-2.5 border-t border-neutral-800 text-xs font-mono text-neutral-400 flex items-center gap-3">

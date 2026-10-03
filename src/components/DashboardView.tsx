@@ -22,21 +22,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [displayCount, setDisplayCount] = useState(15);
 
-  const mainGoalUsd = CAMPAIGN_CONFIG.MAIN_GOAL_USD;
-  const mainGoalInr = CAMPAIGN_CONFIG.MAIN_GOAL_INR;
-  const finalGoalUsd = CAMPAIGN_CONFIG.FINAL_GOAL_USD;
-  const finalGoalInr = CAMPAIGN_CONFIG.FINAL_GOAL_INR;
+  const communityGoalUsd = CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
+  const communityGoalInr = CAMPAIGN_CONFIG.COMMUNITY_GOAL_INR;
 
   const usdRaised = summary.total_usd_raised;
   const inrRaised = summary.total_inr_raised;
 
-  const isMainGoalReached = usdRaised >= mainGoalUsd;
-  const isFinalGoalReached = usdRaised >= finalGoalUsd || campaign.campaign_status === 'goal_reached';
+  const isGoalReached = usdRaised >= communityGoalUsd || campaign.campaign_status === 'goal_reached';
 
-  const remainingMainUsd = Math.max(0, Math.round((mainGoalUsd - usdRaised) * 100) / 100);
-  const remainingMainInr = Math.max(0, mainGoalInr - inrRaised);
-  const remainingFinalUsd = Math.max(0, Math.round((finalGoalUsd - usdRaised) * 100) / 100);
-  const remainingFinalInr = Math.max(0, finalGoalInr - inrRaised);
+  const remainingUsd = Math.max(0, Math.round((communityGoalUsd - usdRaised) * 100) / 100);
+  const remainingInr = Math.max(0, communityGoalInr - inrRaised);
 
   const upiDonations = donations.filter(d => d.payment_method === 'upi');
   const intlDonations = donations.filter(d => d.payment_method === 'international');
@@ -109,12 +104,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="sm:border-r border-[var(--line)] px-3 sm:px-5 py-4">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 block">main goal</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 block">community goal</span>
               <div className="font-mono mt-1">
-                <span className="text-xl sm:text-3xl font-bold text-neutral-100">${mainGoalUsd}</span>
-                <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{mainGoalInr.toLocaleString('en-IN')})</span>
+                <span className="text-xl sm:text-3xl font-bold text-neutral-100">${communityGoalUsd}</span>
+                <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
               </div>
-              <span className="text-[10px] text-neutral-400 font-mono block mt-1">Final (optional): ${finalGoalUsd} (≈ ₹35k)</span>
+              <span className="text-[10px] text-neutral-400 font-mono block mt-1">Dev covers ~$220 remaining</span>
             </div>
 
             <div className="border-t sm:border-t-0 border-r border-[var(--line)] px-3 sm:px-5 py-4">
@@ -129,12 +124,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">remaining</span>
               <div className="font-mono mt-1">
                 <span className="text-xl sm:text-3xl font-bold text-neutral-100">
-                  {isMainGoalReached ? (isFinalGoalReached ? '$0' : `$${remainingFinalUsd}`) : `$${remainingMainUsd}`}
+                  {isGoalReached ? '$0' : `$${remainingUsd}`}
                 </span>
                 <span className="text-[11px] text-[var(--muted)] block mt-0.5">
-                  {isMainGoalReached
-                    ? (isFinalGoalReached ? 'all goals met 🎉' : `(≈ ₹${remainingFinalInr.toLocaleString('en-IN')} to final)`)
-                    : `(≈ ₹${remainingMainInr.toLocaleString('en-IN')} to main)`}
+                  {isGoalReached
+                    ? 'goal met 🎉 dev covers rest'
+                    : `(≈ ₹${remainingInr.toLocaleString('en-IN')} to goal)`}
                 </span>
               </div>
             </div>

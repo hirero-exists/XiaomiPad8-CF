@@ -16,20 +16,36 @@ export interface Milestone {
 }
 
 export const CAMPAIGN_CONFIG = {
-  // Goal Settings (USD is primary everywhere)
-  MAIN_GOAL_USD: 290,
-  MAIN_GOAL_INR: 25000,
-  FINAL_GOAL_USD: 400,
-  FINAL_GOAL_INR: 35000,
-  COMMUNITY_GOAL_USD: 290, // First main goal for base tablet bring-up
+  // Single Community Goal: $290 (≈ ₹25,000)
+  COMMUNITY_GOAL_USD: 290,
   COMMUNITY_GOAL_INR: 25000,
-  DEVICE_PRICE_USD_APPROX: 600,
-  DEVICE_PRICE_INR: 52000,
+
+  // Hardware Details & Online Market Pricing
+  TABLET_NAME: "Xiaomi Pad 8",
+  TABLET_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Base Variant",
+  TABLET_PRICE_USD: 440,
+  TABLET_PRICE_INR: 38000,
+
+  PEN_NAME: "Xiaomi Focus Pen Pro",
+  PEN_SPECS: "16,384 Pressure Levels • Haptic Feedback • <1ms Latency",
+  PEN_PRICE_USD: 70, // Retail price online approx ₹5,499 - ₹5,999 (~$70 USD)
+  PEN_PRICE_INR: 6000,
+
+  // Total Hardware Package (Base Pad 8 + Focus Pen Pro)
+  TOTAL_PACKAGE_USD: 510, // $440 tablet + $70 pen
+  TOTAL_PACKAGE_INR: 44000, // ₹38,000 tablet + ₹6,000 pen
+
+  // Developer Out-of-Pocket Share (Covers remaining tablet + 100% of pen)
+  DEV_COVERED_USD: 220, // $510 - $290
+  DEV_COVERED_INR: 19000, // ₹44,000 - ₹25,000
+
+  DEVICE_PRICE_USD_APPROX: 510,
+  DEVICE_PRICE_INR: 44000,
   FALLBACK_USD_TO_INR: 86.8,
 
   // Device Details
-  DEVICE_NAME: "Xiaomi Pad 8",
-  DEVICE_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Up to 12GB+256GB",
+  DEVICE_NAME: "Xiaomi Pad 8 + Focus Pen Pro",
+  DEVICE_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Xiaomi Focus Pen Pro (16k Pressure)",
   DEVICE_IMAGE_PATH: "./images/xiaomi-pad-8.png",
 
   // Payment Configuration
@@ -38,48 +54,22 @@ export const CAMPAIGN_CONFIG = {
   UPI_QR_IMAGE: import.meta.env.VITE_UPI_QR_URL || "./images/upi-qr.png",
   INTERNATIONAL_PAYMENT_URL: import.meta.env.VITE_INTERNATIONAL_PAYMENT_URL || "https://www.thankyouverymuch.co/xiaomipad8",
 
-  // 3 Milestones: $290 (≈ ₹25k, 71.4%), $345 (≈ ₹30k, 85.7%), $400 (≈ ₹35k, 100% Final)
+  // Single Community Milestone ($290 / ₹25,000)
   MILESTONES: [
     {
       id: 'm1',
       usdTarget: 290,
       inrApprox: 25000,
-      percentage: 71.4,
+      percentage: 100,
       label: "$290 (≈ ₹25,000)",
-      tierName: "Tier 1",
-      title: "Base Pad 8 Variant",
-      hardware: "Base Variant Tablet",
-      deviceCostUsdApprox: 440,
-      deviceCostInr: 38000,
-      description: "If $290 (≈ ₹25,000) is reached, as the base tablet costs ~$440 (≈ ₹38,000), the developer will cover the rest personally to begin kernel & custom ROM bring-up.",
-    },
-    {
-      id: 'm2',
-      usdTarget: 345,
-      inrApprox: 30000,
-      percentage: 85.7,
-      label: "$345 (≈ ₹30,000)",
-      tierName: "Tier 2",
-      title: "Higher Variant / Stylus",
-      hardware: "Upgraded Spec OR Official Stylus Pen",
+      tierName: "Community Goal",
+      title: "Xiaomi Pad 8 + Focus Pen Pro Bring-Up",
+      hardware: "Base Pad 8 ($440) + Focus Pen Pro ($70, Dev Covered)",
       deviceCostUsdApprox: 510,
       deviceCostInr: 44000,
-      description: "If $345 (≈ ₹30,000) is reached, as the upgraded variant or stylus package costs ~$510 (≈ ₹44,000), the developer will cover the rest personally for low-latency input HAL testing.",
-    },
-    {
-      id: 'm3',
-      usdTarget: 400,
-      inrApprox: 35000,
-      percentage: 100,
-      label: "$400 Final (≈ ₹35,000)",
-      tierName: "Final Goal",
-      title: "Top Variant + Full Accessories",
-      hardware: "Top-Tier Spec + Keyboard + Stylus Pen",
-      deviceCostUsdApprox: 600,
-      deviceCostInr: 52000,
-      description: "If $400 (≈ ₹35,000) is reached, as the highest variant + full keyboard & pen accessories costs ~$600 (≈ ₹52,000), the developer will cover the rest personally for complete workstation mode.",
+      description: "Community funds $290 (≈ ₹25,000). The developer personally covers the remaining ~$150 tablet cost + 100% of the Xiaomi Focus Pen Pro (~$70 / ₹6,000) out-of-pocket for complete ROM bring-up and stylus HAL testing.",
       isFinal: true,
-    },
+    }
   ] as Milestone[],
 
   // Community Links
