@@ -16,9 +16,13 @@ export interface Milestone {
 }
 
 export const CAMPAIGN_CONFIG = {
-  // Goal Settings (USD is primary everywhere, with ₹35,000 final milestone)
-  COMMUNITY_GOAL_USD: 400,
-  COMMUNITY_GOAL_INR: 35000,
+  // Goal Settings (USD is primary everywhere)
+  MAIN_GOAL_USD: 290,
+  MAIN_GOAL_INR: 25000,
+  FINAL_GOAL_USD: 400,
+  FINAL_GOAL_INR: 35000,
+  COMMUNITY_GOAL_USD: 290, // First main goal for base tablet bring-up
+  COMMUNITY_GOAL_INR: 25000,
   DEVICE_PRICE_USD_APPROX: 600,
   DEVICE_PRICE_INR: 52000,
   FALLBACK_USD_TO_INR: 86.8,

@@ -17,24 +17,32 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const [animatedWidth, setAnimatedWidth] = useState(0);
 
-  const usdGoal = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
-  const inrGoal = Math.round(usdGoal * fxRate);
+  const mainGoalUsd = CAMPAIGN_CONFIG.MAIN_GOAL_USD;
+  const mainGoalInr = CAMPAIGN_CONFIG.MAIN_GOAL_INR;
+  const finalGoalUsd = CAMPAIGN_CONFIG.FINAL_GOAL_USD;
+  const finalGoalInr = CAMPAIGN_CONFIG.FINAL_GOAL_INR;
 
   const usdRaised = summary.total_usd_raised;
   const inrRaised = summary.total_inr_raised;
 
-  const remainingUsd = Math.max(0, Math.round((usdGoal - usdRaised) * 100) / 100);
-  const remainingInr = Math.max(0, inrGoal - inrRaised);
+  const remainingMainUsd = Math.max(0, Math.round((mainGoalUsd - usdRaised) * 100) / 100);
+  const remainingMainInr = Math.max(0, mainGoalInr - inrRaised);
+  const remainingFinalUsd = Math.max(0, Math.round((finalGoalUsd - usdRaised) * 100) / 100);
+  const remainingFinalInr = Math.max(0, finalGoalInr - inrRaised);
 
-  const percentage = Math.min(100, Math.max(0, Math.round((usdRaised / usdGoal) * 100)));
-  const isGoalReached = usdRaised >= usdGoal || campaign.campaign_status === 'goal_reached';
+  const isMainGoalReached = usdRaised >= mainGoalUsd;
+  const isFinalGoalReached = usdRaised >= finalGoalUsd || campaign.campaign_status === 'goal_reached';
+
+  const percentageOfMain = Math.round((usdRaised / mainGoalUsd) * 100);
+  // Bar width scaled across the full range up to final goal ($400)
+  const barPercentage = Math.min(100, Math.max(0, Math.round((usdRaised / finalGoalUsd) * 100)));
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAnimatedWidth(percentage);
+      setAnimatedWidth(barPercentage);
     }, 100);
     return () => clearTimeout(timer);
-  }, [percentage]);
+  }, [barPercentage]);
 
   return (
     <section className="relative overflow-hidden border-b border-[var(--line)]">
@@ -83,11 +91,12 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           <div className="sm:border-r border-[var(--line)] px-3 sm:px-5 py-4 sm:py-5">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">final goal</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 block">main goal</span>
             <div className="font-mono mt-1">
-              <span className="text-xl sm:text-3xl font-bold text-neutral-100">${usdGoal}</span>
-              <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{inrGoal.toLocaleString('en-IN')})</span>
+              <span className="text-xl sm:text-3xl font-bold text-neutral-100">${mainGoalUsd}</span>
+              <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{mainGoalInr.toLocaleString('en-IN')})</span>
             </div>
+            <span className="text-[10px] text-neutral-400 font-mono block mt-1">Final (optional): ${finalGoalUsd} (≈ ₹35k)</span>
           </div>
 
           <div className="border-t sm:border-t-0 border-r border-[var(--line)] px-3 sm:px-5 py-4 sm:py-5">
@@ -102,10 +111,12 @@ export const Hero: React.FC<HeroProps> = ({
             <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">remaining</span>
             <div className="font-mono mt-1">
               <span className="text-xl sm:text-3xl font-bold text-neutral-100">
-                {isGoalReached ? '$0' : `$${remainingUsd}`}
+                {isMainGoalReached ? (isFinalGoalReached ? '$0' : `$${remainingFinalUsd}`) : `$${remainingMainUsd}`}
               </span>
               <span className="text-[11px] text-[var(--muted)] block mt-0.5">
-                {isGoalReached ? 'goal completed' : `(≈ ₹${remainingInr.toLocaleString('en-IN')})`}
+                {isMainGoalReached
+                  ? (isFinalGoalReached ? 'all goals completed 🎉' : `(≈ ₹${remainingFinalInr.toLocaleString('en-IN')} to final)`)
+                  : `(≈ ₹${remainingMainInr.toLocaleString('en-IN')} to main)`}
               </span>
             </div>
           </div>
@@ -115,108 +126,138 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="mt-8">
           <div className="flex flex-wrap items-center justify-between font-mono text-xs text-[var(--muted)] mb-2.5 gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-neutral-100 font-bold">{percentage}% FUNDED</span>
-              {percentage >= 100 ? (
+              <span className="text-neutral-100 font-bold">{percentageOfMain}% OF MAIN GOAL</span>
+              {isFinalGoalReached ? (
                 <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                   ALL TIERS MET 🎉
                 </span>
-              ) : percentage >= 85.7 ? (
+              ) : usdRaised >= 345 ? (
                 <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
                   TIER 2 MET (+STYLUS)
                 </span>
-              ) : percentage >= 71.4 ? (
-                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                  TIER 1 MET (BASE)
+              ) : isMainGoalReached ? (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  MAIN GOAL REACHED (BASE TABLET)
                 </span>
               ) : (
-                <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
-                  NEXT: TIER 1 @ 71.4%
+                <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
+                  TARGET: $290 (≈ ₹25k)
                 </span>
               )}
             </div>
-            <span>{isGoalReached ? 'FINAL TARGET REACHED 🎉' : `$${remainingUsd} TO FINAL GOAL`}</span>
+            <div className="text-right text-[11px]">
+              {isMainGoalReached ? (
+                <span className="text-emerald-400 font-medium">
+                  {isFinalGoalReached ? 'All goals funded!' : `$${remainingFinalUsd} to final optional target`}
+                </span>
+              ) : (
+                <span>${remainingMainUsd} to main goal • Final (optional): $${finalGoalUsd}</span>
+              )}
+            </div>
           </div>
 
           {/* Progress Bar Track with Notch Dividers */}
-          <div className="relative h-4 sm:h-5 border border-neutral-700 bg-neutral-950 p-0.5 rounded-sm overflow-hidden">
+          <div className="relative h-3.5 sm:h-4 border border-neutral-700 bg-neutral-950 p-0.5 rounded-sm overflow-hidden">
             {/* Animated Fill Bar */}
             <div
               className={`h-full transition-all duration-700 ease-out ${
-                isGoalReached ? 'bg-emerald-400' : 'bg-neutral-100'
+                isFinalGoalReached
+                  ? 'bg-emerald-400'
+                  : isMainGoalReached
+                  ? 'bg-blue-400'
+                  : 'bg-neutral-100'
               }`}
               style={{ width: `${animatedWidth}%` }}
             />
 
-            {/* Milestone 1 Notch: 71.4% (₹25k) */}
+            {/* Main Goal Notch: 71.4% ($290) */}
             <div
               className="absolute top-0 bottom-0 w-[2px] z-10 pointer-events-none"
               style={{ left: '71.4%' }}
-              title="Tier 1: 71.4% (₹25k Base Variant)"
+              title="Main Goal: $290 (₹25k Base Variant)"
             >
               <div className={`h-full w-full ${animatedWidth >= 71.4 ? 'bg-neutral-900/90' : 'bg-neutral-500/70'}`} />
             </div>
 
-            {/* Milestone 2 Notch: 85.7% (₹30k) */}
+            {/* Tier 2 Notch: 85.7% ($345) */}
             <div
               className="absolute top-0 bottom-0 w-[2px] z-10 pointer-events-none"
               style={{ left: '85.7%' }}
-              title="Tier 2: 85.7% (₹30k Upgraded / Stylus)"
+              title="Tier 2: $345 (₹30k Upgraded / Stylus)"
             >
               <div className={`h-full w-full ${animatedWidth >= 85.7 ? 'bg-neutral-900/90' : 'bg-neutral-500/70'}`} />
             </div>
           </div>
 
-          {/* Milestone Indicators Under The Bar */}
-          <div className="relative w-full h-12 sm:h-14 mt-2 font-mono text-[11px] select-none">
-            {/* 0% Start */}
-            <div className="absolute top-0 left-0 flex flex-col items-start text-neutral-600">
-              <span className="text-[10px] leading-none mb-1">▲</span>
-              <span className="text-[10px] font-semibold text-neutral-500">$0</span>
-              <span className="text-[9px] text-neutral-600">Start</span>
+          {/* 3 Structured Milestone Cards Down Below The Bar (Clean, Zero Collision, Mobile Optimized) */}
+          <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-3 gap-2.5 font-mono text-xs">
+            {/* Card 1: Main Goal */}
+            <div className={`p-3 rounded-lg border transition-all ${
+              usdRaised >= 290
+                ? 'bg-blue-950/20 border-blue-500/40 text-blue-200'
+                : 'bg-neutral-900/60 border-[var(--line)] text-neutral-300'
+            }`}>
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="font-bold text-blue-400">01 // MAIN GOAL</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                  usdRaised >= 290 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-800 text-neutral-400'
+                }`}>
+                  {usdRaised >= 290 ? '✓ MET' : '71.4%'}
+                </span>
+              </div>
+              <div className="font-bold text-base text-neutral-100">
+                $290 <span className="text-xs text-[var(--muted)] font-normal">(≈ ₹25,000)</span>
+              </div>
+              <div className="text-[11px] text-[var(--muted)] mt-1 flex items-center justify-between">
+                <span>Base Pad 8 Variant</span>
+                <span className="text-[10px] text-neutral-500">Retail ~$440</span>
+              </div>
             </div>
 
-            {/* Milestone 1: 71.4% ($290 / ₹25k) */}
-            <div
-              className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
-              style={{ left: '71.4%' }}
-              title="Tier 1: $290 (≈ ₹25,000) - Base Variant (Retail ~$440 / ₹38,000, Dev covers rest)"
-            >
-              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 71.4 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
-              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 71.4 ? 'text-blue-400' : 'text-neutral-300'}`}>
-                71.4%
-              </span>
-              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                $290 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹25k)</span> <span className="hidden sm:inline">• Base</span>
-              </span>
+            {/* Card 2: Tier 2 */}
+            <div className={`p-3 rounded-lg border transition-all ${
+              usdRaised >= 345
+                ? 'bg-blue-950/20 border-blue-500/40 text-blue-200'
+                : 'bg-neutral-900/60 border-[var(--line)] text-neutral-300'
+            }`}>
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="font-bold text-neutral-200">02 // UPGRADED</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                  usdRaised >= 345 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-800 text-neutral-400'
+                }`}>
+                  {usdRaised >= 345 ? '✓ MET' : '85.7%'}
+                </span>
+              </div>
+              <div className="font-bold text-base text-neutral-100">
+                $345 <span className="text-xs text-[var(--muted)] font-normal">(≈ ₹30,000)</span>
+              </div>
+              <div className="text-[11px] text-[var(--muted)] mt-1 flex items-center justify-between">
+                <span>+ Stylus Pen / RAM</span>
+                <span className="text-[10px] text-neutral-500">Retail ~$510</span>
+              </div>
             </div>
 
-            {/* Milestone 2: 85.7% ($345 / ₹30k) */}
-            <div
-              className="absolute top-0 flex flex-col items-center -translate-x-1/2 transition-colors"
-              style={{ left: '85.7%' }}
-              title="Tier 2: $345 (≈ ₹30,000) - Upgraded / Stylus (Retail ~$510 / ₹44,000, Dev covers rest)"
-            >
-              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 85.7 ? 'text-blue-400 font-bold' : 'text-neutral-500'}`}>▲</span>
-              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 85.7 ? 'text-blue-400' : 'text-neutral-300'}`}>
-                85.7%
-              </span>
-              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                $345 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹30k)</span> <span className="hidden sm:inline">• +Stylus</span>
-              </span>
-            </div>
-
-            {/* Final Goal: 100% ($400 / ₹35k) */}
-            <div
-              className="absolute top-0 right-0 flex flex-col items-end transition-colors"
-              title="Tier 3 (Final): $400 (≈ ₹35,000) - Top Variant + Keyboard & Pen (Retail ~$600 / ₹52,000, Dev covers rest)"
-            >
-              <span className={`text-[10px] leading-none mb-1 ${animatedWidth >= 100 ? 'text-emerald-400 font-bold' : 'text-neutral-500'}`}>▲</span>
-              <span className={`text-[10px] sm:text-xs font-bold tracking-tight ${animatedWidth >= 100 ? 'text-emerald-400' : 'text-neutral-200'}`}>
-                100% FINAL
-              </span>
-              <span className="text-[10px] text-[var(--muted)] whitespace-nowrap">
-                $400 <span className="text-neutral-400 font-sans text-[9px]">(≈ ₹35k)</span> <span className="hidden sm:inline">• Keybd+Pen</span>
-              </span>
+            {/* Card 3: Final (Optional) */}
+            <div className={`p-3 rounded-lg border transition-all ${
+              usdRaised >= 400
+                ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-200'
+                : 'bg-neutral-900/60 border-[var(--line)] text-neutral-300'
+            }`}>
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="font-bold text-emerald-400">03 // FINAL (OPTIONAL)</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                  usdRaised >= 400 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-800 text-neutral-400'
+                }`}>
+                  {usdRaised >= 400 ? '✓ MET' : '100%'}
+                </span>
+              </div>
+              <div className="font-bold text-base text-neutral-100">
+                $400 <span className="text-xs text-[var(--muted)] font-normal">(≈ ₹35,000)</span>
+              </div>
+              <div className="text-[11px] text-[var(--muted)] mt-1 flex items-center justify-between">
+                <span>Keyboard + Pen + Top Spec</span>
+                <span className="text-[10px] text-neutral-500">Retail ~$600</span>
+              </div>
             </div>
           </div>
         </div>

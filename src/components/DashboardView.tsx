@@ -22,12 +22,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [displayCount, setDisplayCount] = useState(15);
 
-  const usdGoal = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
-  const inrGoal = Math.round(usdGoal * fxRate);
+  const mainGoalUsd = CAMPAIGN_CONFIG.MAIN_GOAL_USD;
+  const mainGoalInr = CAMPAIGN_CONFIG.MAIN_GOAL_INR;
+  const finalGoalUsd = CAMPAIGN_CONFIG.FINAL_GOAL_USD;
+  const finalGoalInr = CAMPAIGN_CONFIG.FINAL_GOAL_INR;
+
   const usdRaised = summary.total_usd_raised;
   const inrRaised = summary.total_inr_raised;
-  const remainingUsd = Math.max(0, Math.round((usdGoal - usdRaised) * 100) / 100);
-  const remainingInr = Math.max(0, inrGoal - inrRaised);
+
+  const isMainGoalReached = usdRaised >= mainGoalUsd;
+  const isFinalGoalReached = usdRaised >= finalGoalUsd || campaign.campaign_status === 'goal_reached';
+
+  const remainingMainUsd = Math.max(0, Math.round((mainGoalUsd - usdRaised) * 100) / 100);
+  const remainingMainInr = Math.max(0, mainGoalInr - inrRaised);
+  const remainingFinalUsd = Math.max(0, Math.round((finalGoalUsd - usdRaised) * 100) / 100);
+  const remainingFinalInr = Math.max(0, finalGoalInr - inrRaised);
 
   const upiDonations = donations.filter(d => d.payment_method === 'upi');
   const intlDonations = donations.filter(d => d.payment_method === 'international');
@@ -77,8 +86,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span>back to campaign</span>
           </button>
 
-          <div className="font-mono text-xs text-[var(--muted)] mb-2">
-            ● PUBLIC DASHBOARD
+          <div className="font-mono text-xs text-[var(--muted)] mb-2 flex items-center justify-between">
+            <span>● PUBLIC DASHBOARD</span>
+            <span className="text-neutral-500 text-[11px]">1 USD ≈ ₹{fxRate.toFixed(2)}</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-neutral-100">
@@ -99,11 +109,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="sm:border-r border-[var(--line)] px-3 sm:px-5 py-4">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">goal</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 block">main goal</span>
               <div className="font-mono mt-1">
-                <span className="text-xl sm:text-3xl font-bold text-neutral-100">${usdGoal}</span>
-                <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{inrGoal.toLocaleString('en-IN')})</span>
+                <span className="text-xl sm:text-3xl font-bold text-neutral-100">${mainGoalUsd}</span>
+                <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{mainGoalInr.toLocaleString('en-IN')})</span>
               </div>
+              <span className="text-[10px] text-neutral-400 font-mono block mt-1">Final (optional): ${finalGoalUsd} (≈ ₹35k)</span>
             </div>
 
             <div className="border-t sm:border-t-0 border-r border-[var(--line)] px-3 sm:px-5 py-4">
@@ -117,8 +128,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="border-t sm:border-t-0 px-3 sm:px-5 py-4">
               <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] block">remaining</span>
               <div className="font-mono mt-1">
-                <span className="text-xl sm:text-3xl font-bold text-neutral-100">${remainingUsd}</span>
-                <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{remainingInr.toLocaleString('en-IN')})</span>
+                <span className="text-xl sm:text-3xl font-bold text-neutral-100">
+                  {isMainGoalReached ? (isFinalGoalReached ? '$0' : `$${remainingFinalUsd}`) : `$${remainingMainUsd}`}
+                </span>
+                <span className="text-[11px] text-[var(--muted)] block mt-0.5">
+                  {isMainGoalReached
+                    ? (isFinalGoalReached ? 'all goals met 🎉' : `(≈ ₹${remainingFinalInr.toLocaleString('en-IN')} to final)`)
+                    : `(≈ ₹${remainingMainInr.toLocaleString('en-IN')} to main)`}
+                </span>
               </div>
             </div>
           </div>
