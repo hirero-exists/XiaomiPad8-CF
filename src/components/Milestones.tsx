@@ -64,8 +64,8 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                   </div>
 
                   <div className="mt-2 py-1 px-2 rounded bg-neutral-950/80 border border-neutral-800 text-[10px]">
-                    <span className="text-neutral-400 block font-mono">Retail Tablet: ~$440 (≈ ₹38,000)</span>
-                    <span className="text-blue-400 font-sans font-medium block mt-0.5">Community Share: ~59%</span>
+                    <span className="text-neutral-400 block font-mono">Retail Tablet: ~$400 (≈ ₹38,000)</span>
+                    <span className="text-blue-400 font-sans font-medium block mt-0.5">Community Share: ~65%</span>
                   </div>
 
                   <div className="mt-3">
@@ -108,7 +108,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
 
                   <div className="mt-1">
                     <span className="text-xl font-bold text-neutral-100">
-                      ~$70
+                      ~$65
                     </span>
                     <span className="text-xs text-[var(--muted)] block">
                       (≈ ₹6,000)
@@ -154,7 +154,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
 
                   <div className="mt-1">
                     <span className="text-xl font-bold text-neutral-100">
-                      ~$510
+                      ~$465
                     </span>
                     <span className="text-xs text-[var(--muted)] block">
                       (≈ ₹44,000)
@@ -162,7 +162,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                   </div>
 
                   <div className="mt-2 py-1 px-2 rounded bg-neutral-950/80 border border-neutral-800 text-[10px]">
-                    <span className="text-neutral-400 block font-mono">Dev Co-Funding: ~$250 (≈ ₹19,000)</span>
+                    <span className="text-neutral-400 block font-mono">Dev Co-Funding: ~$205 (≈ ₹19,000)</span>
                     <span className="text-neutral-300 font-sans font-medium block mt-0.5">+ Shipping, Taxes & Customs</span>
                   </div>
 

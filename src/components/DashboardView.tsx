@@ -109,7 +109,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="text-xl sm:text-3xl font-bold text-neutral-100">${communityGoalUsd}</span>
                 <span className="text-[11px] text-[var(--muted)] block mt-0.5">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
               </div>
-              <span className="text-[10px] text-neutral-400 font-mono block mt-1">Dev covers ~$250 remaining</span>
+              <span className="text-[10px] text-neutral-400 font-mono block mt-1">Dev covers ~$205 remaining</span>
             </div>
 
             <div className="border-t sm:border-t-0 border-r border-[var(--line)] px-3 sm:px-5 py-4">

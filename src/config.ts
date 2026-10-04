@@ -23,23 +23,23 @@ export const CAMPAIGN_CONFIG = {
   // Hardware Details & Online Market Pricing
   TABLET_NAME: "Xiaomi Pad 8",
   TABLET_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Base Variant",
-  TABLET_PRICE_USD: 440,
+  TABLET_PRICE_USD: 400,
   TABLET_PRICE_INR: 38000,
 
   PEN_NAME: "Xiaomi Focus Pen Pro",
   PEN_SPECS: "16,384 Pressure Levels • Haptic Feedback • <1ms Latency",
-  PEN_PRICE_USD: 70, // Retail price online approx ₹5,499 - ₹5,999 (~$70 USD)
+  PEN_PRICE_USD: 65, // Retail price online approx ₹5,499 - ₹5,999 (~$65 USD)
   PEN_PRICE_INR: 6000,
 
   // Total Hardware Package (Base Pad 8 + Focus Pen Pro)
-  TOTAL_PACKAGE_USD: 510, // $440 tablet + $70 pen
+  TOTAL_PACKAGE_USD: 465, // $400 tablet + $65 pen
   TOTAL_PACKAGE_INR: 44000, // ₹38,000 tablet + ₹6,000 pen
 
   // Developer Out-of-Pocket Share (Covers remaining tablet + 100% of pen)
-  DEV_COVERED_USD: 250, // $510 - $260
+  DEV_COVERED_USD: 205, // ~$205 (≈ ₹19,000)
   DEV_COVERED_INR: 19000, // ₹44,000 - ₹25,000
 
-  DEVICE_PRICE_USD_APPROX: 510,
+  DEVICE_PRICE_USD_APPROX: 465,
   DEVICE_PRICE_INR: 44000,
   FALLBACK_USD_TO_INR: 86.8,
 
@@ -64,10 +64,10 @@ export const CAMPAIGN_CONFIG = {
       label: "$260 (≈ ₹25,000)",
       tierName: "Community Goal",
       title: "Xiaomi Pad 8 + Focus Pen Pro Bring-Up",
-      hardware: "Base Pad 8 ($440) + Focus Pen Pro ($70, Dev Covered)",
-      deviceCostUsdApprox: 510,
+      hardware: "Base Pad 8 ($400) + Focus Pen Pro ($65, Dev Covered)",
+      deviceCostUsdApprox: 465,
       deviceCostInr: 44000,
-      description: "Community funds $260 (≈ ₹25,000). The developer personally covers the remaining ~$180 tablet cost + 100% of the Xiaomi Focus Pen Pro (~$70 / ₹6,000) out-of-pocket for complete ROM bring-up and stylus HAL testing.",
+      description: "Community funds $260 (≈ ₹25,000). The developer personally covers the remaining ~$140 tablet cost + 100% of the Xiaomi Focus Pen Pro (~$65 / ₹6,000) out-of-pocket for complete ROM bring-up and stylus HAL testing.",
       isFinal: true,
     }
   ] as Milestone[],
