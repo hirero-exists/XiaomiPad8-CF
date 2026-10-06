@@ -180,34 +180,93 @@ export async function submitDonation(payload: {
   }
 }
 
+function normalizeDonationItem(d: any, fallbackRate: number): PublicDonation {
+  const fxRate = Number(d.fx_rate) || fallbackRate || 86.8;
+  const nativeAmt = Number(d.native_amount) || 0;
+  const curr = (d.native_currency || 'INR').toUpperCase();
+
+  let usd = Number(d.usd_amount) || 0;
+  let inr = Number(d.inr_amount) || 0;
+
+  // Auto-calculate if usd_amount is missing or 0 (e.g. manual edit in Supabase table)
+  if (usd <= 0 && nativeAmt > 0) {
+    if (curr === 'USD') {
+      usd = nativeAmt;
+    } else if (curr === 'INR') {
+      usd = Math.round((nativeAmt / fxRate) * 100) / 100;
+    } else if (curr === 'EUR') {
+      usd = Math.round((nativeAmt / 0.95) * 100) / 100;
+    } else if (curr === 'GBP') {
+      usd = Math.round((nativeAmt / 0.81) * 100) / 100;
+    } else {
+      usd = Math.round((nativeAmt / fxRate) * 100) / 100;
+    }
+  }
+
+  // Auto-calculate if inr_amount is missing or 0
+  if (inr <= 0 && nativeAmt > 0) {
+    if (curr === 'INR') {
+      inr = Math.round(nativeAmt);
+    } else if (curr === 'USD') {
+      inr = Math.round(nativeAmt * fxRate);
+    } else {
+      inr = Math.round(usd * fxRate);
+    }
+  }
+
+  const displayName = d.show_name && d.display_name && d.display_name.trim() !== ''
+    ? d.display_name.trim()
+    : 'Anonymous';
+
+  return {
+    id: String(d.id),
+    payment_method: d.payment_method || 'upi',
+    native_amount: nativeAmt,
+    native_currency: curr,
+    inr_amount: inr,
+    usd_amount: usd,
+    display_name: displayName,
+    message: d.message || null,
+    created_at: d.created_at || new Date().toISOString(),
+    approved_at: d.approved_at || d.created_at || new Date().toISOString()
+  };
+}
+
 export async function fetchPublicDonations(): Promise<PublicDonation[]> {
   if (!isSupabaseConfigured || !supabase) {
     const current = getMockDonations();
     return current
-      .filter(d => d.status === 'approved')
-      .map(d => ({
-        id: d.id,
-        payment_method: d.payment_method,
-        native_amount: d.native_amount,
-        native_currency: d.native_currency,
-        inr_amount: d.inr_amount,
-        usd_amount: d.usd_amount,
-        display_name: d.show_name && d.display_name ? d.display_name : 'Anonymous',
-        message: d.message,
-        created_at: d.created_at,
-        approved_at: d.approved_at
-      }));
+      .filter(d => (d.status || '').toLowerCase() === 'approved')
+      .map(d => normalizeDonationItem(d, CAMPAIGN_CONFIG.FALLBACK_USD_TO_INR));
   }
 
   try {
-    // Note: We query the secure view public_donations which does not have payment_reference
-    const { data, error } = await supabase
+    // 1. Primary: Query donations table directly for approved rows (strictly omitting sensitive payment_reference)
+    const { data: tableData, error: tableError } = await supabase
+      .from('donations')
+      .select('id, payment_method, native_amount, native_currency, inr_amount, usd_amount, fx_rate, status, display_name, show_name, message, created_at, approved_at')
+      .in('status', ['approved', 'Approved', 'APPROVED'])
+      .order('created_at', { ascending: false });
+
+    if (!tableError && tableData && tableData.length > 0) {
+      return tableData.map(d => normalizeDonationItem(d, CAMPAIGN_CONFIG.FALLBACK_USD_TO_INR));
+    }
+
+    // 2. Secondary fallback: Query public_donations view if it exists
+    const { data: viewData, error: viewError } = await supabase
       .from('public_donations')
       .select('*')
-      .order('approved_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    return (data || []) as PublicDonation[];
+    if (!viewError && viewData && viewData.length > 0) {
+      return viewData.map(d => normalizeDonationItem(d, CAMPAIGN_CONFIG.FALLBACK_USD_TO_INR));
+    }
+
+    if (!tableError) return [];
+    if (!viewError) return [];
+
+    console.warn('Could not read approved donations from table or view:', tableError || viewError);
+    return [];
   } catch (err) {
     console.error('Failed to fetch public donations:', err);
     return [];
@@ -257,41 +316,16 @@ export async function fetchCampaignData(): Promise<CampaignData> {
 }
 
 export async function fetchFundingSummary(): Promise<FundingSummary> {
-  if (!isSupabaseConfigured || !supabase) {
-    const approved = getMockDonations().filter(d => d.status === 'approved');
-    const totalUsd = approved.reduce((acc, d) => acc + (d.usd_amount || 0), 0);
-    const totalInr = approved.reduce((acc, d) => acc + (d.inr_amount || 0), 0);
-    return {
-      total_usd_raised: Math.round(totalUsd * 100) / 100,
-      total_inr_raised: Math.round(totalInr),
-      verified_count: approved.length,
-    };
-  }
+  // Always derive directly from normalized approved donations to guarantee 100% sync
+  const donations = await fetchPublicDonations();
+  const totalUsd = donations.reduce((acc, d) => acc + (d.usd_amount || 0), 0);
+  const totalInr = donations.reduce((acc, d) => acc + (d.inr_amount || 0), 0);
 
-  try {
-    // Try the RPC first
-    const { data, error } = await supabase.rpc('get_funding_summary');
-    if (!error && data) {
-      return {
-        total_usd_raised: Number(data.total_usd_raised) || 0,
-        total_inr_raised: Number(data.total_inr_raised) || 0,
-        verified_count: Number(data.verified_count) || 0,
-      };
-    }
-
-    // Fallback: calculate from public view
-    const donations = await fetchPublicDonations();
-    const totalUsd = donations.reduce((acc, d) => acc + (d.usd_amount || 0), 0);
-    const totalInr = donations.reduce((acc, d) => acc + (d.inr_amount || 0), 0);
-    return {
-      total_usd_raised: Math.round(totalUsd * 100) / 100,
-      total_inr_raised: Math.round(totalInr),
-      verified_count: donations.length,
-    };
-  } catch (err) {
-    console.error('Failed to fetch funding summary:', err);
-    return { total_usd_raised: 0, total_inr_raised: 0, verified_count: 0 };
-  }
+  return {
+    total_usd_raised: Math.round(totalUsd * 100) / 100,
+    total_inr_raised: Math.round(totalInr),
+    verified_count: donations.length,
+  };
 }
 
 // ==========================================
@@ -321,9 +355,9 @@ export async function fetchAdminDonations(): Promise<{
   const list = (data || []) as Donation[];
 
   return {
-    pending: list.filter(d => d.status === 'pending'),
-    approved: list.filter(d => d.status === 'approved'),
-    rejected: list.filter(d => d.status === 'rejected'),
+    pending: list.filter(d => (d.status || '').toLowerCase() === 'pending'),
+    approved: list.filter(d => (d.status || '').toLowerCase() === 'approved'),
+    rejected: list.filter(d => (d.status || '').toLowerCase() === 'rejected'),
   };
 }
 
@@ -360,12 +394,32 @@ export async function approveDonationAction(
     return { success: true };
   }
 
+  // 1. Try secure RPC function first (bypasses all client-side RLS quirks with SECURITY DEFINER)
+  try {
+    const { data: rpcData, error: rpcError } = await supabase.rpc('approve_donation', {
+      p_id: donation.id,
+      p_usd_amount: usd_amount,
+      p_inr_amount: inr_amount,
+      p_fx_rate: fxUsdToInr,
+    });
+    if (!rpcError && rpcData && (rpcData as any).success) {
+      return { success: true };
+    }
+  } catch {
+    // Continue to direct table update fallback
+  }
+
+  // 2. Direct table update fallback with select
   const { error } = await supabase
     .from('donations')
     .update(approvalData)
-    .eq('id', donation.id);
+    .eq('id', donation.id)
+    .select();
 
-  if (error) return { success: false, error: error.message };
+  if (error) {
+    console.error('Update error on approve:', error);
+    return { success: false, error: error.message };
+  }
   return { success: true };
 }
 

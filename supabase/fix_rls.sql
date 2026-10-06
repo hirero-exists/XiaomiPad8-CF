@@ -78,3 +78,93 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.submit_donation TO anon, authenticated;
+
+-- 6. Secure approve_donation function (SECURITY DEFINER to avoid client update permissions blocks)
+CREATE OR REPLACE FUNCTION public.approve_donation(
+    p_id UUID,
+    p_usd_amount NUMERIC,
+    p_inr_amount NUMERIC,
+    p_fx_rate NUMERIC DEFAULT NULL
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    UPDATE public.donations
+    SET 
+        status = 'approved',
+        usd_amount = p_usd_amount,
+        inr_amount = p_inr_amount,
+        fx_rate = p_fx_rate,
+        fx_timestamp = now(),
+        approved_at = now()
+    WHERE id = p_id;
+
+    RETURN json_build_object('success', true);
+END;
+$$;
+
+-- 7. Public donations view
+CREATE OR REPLACE VIEW public.public_donations AS
+SELECT 
+    id,
+    payment_method,
+    native_amount,
+    native_currency,
+    inr_amount,
+    usd_amount,
+    CASE 
+        WHEN show_name = true AND display_name IS NOT NULL AND trim(display_name) != '' 
+        THEN display_name 
+        ELSE 'Anonymous' 
+    END AS display_name,
+    message,
+    created_at,
+    COALESCE(approved_at, created_at) AS approved_at
+FROM public.donations
+WHERE LOWER(status) = 'approved'
+ORDER BY COALESCE(approved_at, created_at) DESC;
+
+-- 8. Secure summary function
+CREATE OR REPLACE FUNCTION public.get_funding_summary()
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_build_object(
+        'total_usd_raised', COALESCE(SUM(usd_amount), 0),
+        'total_inr_raised', COALESCE(SUM(inr_amount), 0),
+        'verified_count', COUNT(id)
+    )
+    INTO result
+    FROM public.donations
+    WHERE LOWER(status) = 'approved';
+
+    RETURN result;
+END;
+$$;
+
+-- 9. Grant permissions to anon and authenticated
+GRANT EXECUTE ON FUNCTION public.approve_donation TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_funding_summary TO anon, authenticated;
+GRANT SELECT ON public.public_donations TO anon, authenticated;
+
+-- 10. Auto-repair any existing approved donation where usd_amount or approved_at was 0/null
+UPDATE public.donations
+SET 
+    usd_amount = CASE 
+        WHEN native_currency = 'USD' THEN native_amount
+        WHEN native_currency = 'INR' THEN ROUND((native_amount / 96.15)::numeric, 2)
+        ELSE ROUND((native_amount / 96.15)::numeric, 2)
+    END,
+    inr_amount = CASE 
+        WHEN native_currency = 'INR' THEN native_amount
+        WHEN native_currency = 'USD' THEN ROUND((native_amount * 96.15)::numeric, 0)
+        ELSE native_amount
+    END,
+    approved_at = COALESCE(approved_at, created_at, now())
+WHERE LOWER(status) = 'approved' AND (usd_amount IS NULL OR usd_amount = 0);

@@ -61,6 +61,25 @@ export function App() {
   // Verification modal state
   const [modalMethod, setModalMethod] = useState<PaymentMethod | null>(null);
 
+  // Fetch campaign and public data
+  const loadData = useCallback(async () => {
+    try {
+      const [campaignData, summaryData, donationsData, rates] = await Promise.all([
+        fetchCampaignData(),
+        fetchFundingSummary(),
+        fetchPublicDonations(),
+        getLiveRates(),
+      ]);
+
+      setCampaign(campaignData);
+      setSummary(summaryData);
+      setDonations(donationsData);
+      setFxRate(rates.INR);
+    } catch (err) {
+      console.error('Error loading data:', err);
+    }
+  }, []);
+
   // Hash synchronization
   useEffect(() => {
     const handleHashChange = () => {
@@ -72,16 +91,18 @@ export function App() {
       } else {
         setCurrentView('campaign');
       }
+      loadData();
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [loadData]);
 
   const navigateTo = (view: 'campaign' | 'dashboard' | 'admin') => {
     setCurrentView(view);
     if (view === 'admin') window.location.hash = '#/admin';
     else if (view === 'dashboard') window.location.hash = '#/dashboard';
     else window.location.hash = '#/';
+    loadData();
   };
 
   // Auth session check
@@ -103,27 +124,49 @@ export function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch campaign and public data
-  const loadData = useCallback(async () => {
-    try {
-      const [campaignData, summaryData, donationsData, rates] = await Promise.all([
-        fetchCampaignData(),
-        fetchFundingSummary(),
-        fetchPublicDonations(),
-        getLiveRates(),
-      ]);
-
-      setCampaign(campaignData);
-      setSummary(summaryData);
-      setDonations(donationsData);
-      setFxRate(rates.INR);
-    } catch (err) {
-      console.error('Error loading data:', err);
-    }
-  }, []);
-
+  // Realtime subscription and auto-refresh
   useEffect(() => {
     loadData();
+
+    // Auto-refresh when tab gains focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadData();
+      }
+    };
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    // Periodic background polling every 15s
+    const interval = setInterval(loadData, 15000);
+
+    // Realtime Postgres changes subscription
+    let channel: any = null;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        channel = supabase
+          .channel('public_donations_realtime')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'donations' },
+            () => {
+              loadData();
+            }
+          )
+          .subscribe();
+      } catch (err) {
+        console.warn('Realtime subscription not available, using polling:', err);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [loadData]);
 
   const isGoalReached =
