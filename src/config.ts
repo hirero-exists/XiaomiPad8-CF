@@ -22,7 +22,7 @@ export const CAMPAIGN_CONFIG = {
 
   // Hardware Details & Online Market Pricing
   TABLET_NAME: "Xiaomi Pad 8",
-  TABLET_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Base Variant",
+  TABLET_SPECS: "Snapdragon 8s Gen 4 • 144Hz 3.2K Display • Base Variant",
   TABLET_PRICE_USD: 400,
   TABLET_PRICE_INR: 38000,
 
@@ -45,7 +45,7 @@ export const CAMPAIGN_CONFIG = {
 
   // Device Details
   DEVICE_NAME: "Xiaomi Pad 8 + Focus Pen Pro",
-  DEVICE_SPECS: "Snapdragon 8s Gen 3 • 144Hz 3K Display • Xiaomi Focus Pen Pro (16k Pressure)",
+  DEVICE_SPECS: "Snapdragon 8s Gen 4 • 144Hz 3.2K Display • Xiaomi Focus Pen Pro (16k Pressure)",
   DEVICE_IMAGE_PATH: "./images/xiaomi-pad-8.png",
 
   // Payment Configuration

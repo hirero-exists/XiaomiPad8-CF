@@ -73,7 +73,7 @@ export const Milestones: React.FC<MilestonesProps> = ({ totalUsdRaised, totalInr
                       Xiaomi Pad 8 Bring-Up Fund
                     </span>
                     <span className="text-[11px] text-blue-400/90 block mt-0.5">
-                      Base Tablet (Snapdragon 8s Gen 3)
+                      Base Tablet (Snapdragon 8s Gen 4)
                     </span>
                   </div>
 
