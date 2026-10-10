@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X, Check, Loader2 } from 'lucide-react';
-import { PaymentMethod } from '../lib/types';
-import { submitDonation } from '../lib/supabase';
+import React, { useEffect, useRef, useState } from "react";
+import { X, Check, Loader2 } from "lucide-react";
+import { PaymentMethod } from "../lib/types";
+import { submitDonation } from "../lib/supabase";
 
 interface DonationModalProps {
   isOpen: boolean;
@@ -12,19 +12,77 @@ interface DonationModalProps {
 export const DonationModal: React.FC<DonationModalProps> = ({
   isOpen,
   onClose,
-  initialMethod
+  initialMethod,
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initialMethod);
-  const [amount, setAmount] = useState<string>('');
-  const [currency, setCurrency] = useState<string>(initialMethod === 'upi' ? 'INR' : 'USD');
-  const [reference, setReference] = useState<string>('');
-  const [displayName, setDisplayName] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethod>(initialMethod);
+  const [amount, setAmount] = useState<string>("");
+  const [currency, setCurrency] = useState<string>(
+    initialMethod === "upi" ? "INR" : "USD",
+  );
+  const [reference, setReference] = useState<string>("");
+  const [displayName, setDisplayName] = useState<string>("");
   const [showName, setShowName] = useState<boolean>(true);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  const submittingRef = useRef(isSubmitting);
+  closeRef.current = onClose;
+  submittingRef.current = isSubmitting;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.focus();
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !submittingRef.current) closeRef.current();
+      if (event.key !== "Tab") return;
+      const controls = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          "button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href]",
+        ) || [],
+      );
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) {
+        event.preventDefault();
+        return;
+      }
+      const outsideControls = !controls.includes(
+        document.activeElement as HTMLElement,
+      );
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || outsideControls)
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last || outsideControls)
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKey);
+      previousFocus?.focus();
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (submitted) dialogRef.current?.focus();
+  }, [submitted]);
 
   if (!isOpen) return null;
 
@@ -33,13 +91,13 @@ export const DonationModal: React.FC<DonationModalProps> = ({
     setErrorMessage(null);
 
     const parsedAmount = parseFloat(amount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setErrorMessage('Please enter a valid amount.');
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setErrorMessage("Please enter a valid amount.");
       return;
     }
 
     if (!reference.trim()) {
-      setErrorMessage('Reference / UTR number is required.');
+      setErrorMessage("Reference / UTR number is required.");
       return;
     }
 
@@ -59,10 +117,10 @@ export const DonationModal: React.FC<DonationModalProps> = ({
       if (res.success) {
         setSubmitted(true);
       } else {
-        setErrorMessage(res.error || 'Submission failed. Please try again.');
+        setErrorMessage(res.error || "Submission failed. Please try again.");
       }
     } catch {
-      setErrorMessage('Network error. Please try again.');
+      setErrorMessage("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -70,24 +128,28 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   const handleResetAndClose = () => {
     setSubmitted(false);
-    setAmount('');
-    setReference('');
-    setDisplayName('');
-    setMessage('');
+    setAmount("");
+    setReference("");
+    setDisplayName("");
+    setMessage("");
     setErrorMessage(null);
     onClose();
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="bg-[#121212] border border-neutral-800 rounded-xl max-w-md w-full p-5 sm:p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="donation-dialog-title"
+        tabIndex={-1}
+        className="donation-modal bg-[#191b1f] border border-neutral-800 rounded-xl max-w-md w-full p-5 sm:p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto"
+      >
         {/* Close Button */}
         <button
           onClick={handleResetAndClose}
+          disabled={isSubmitting}
           className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded hover:bg-neutral-800 transition-colors"
           aria-label="Close modal"
         >
@@ -101,8 +163,11 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               <Check className="w-5 h-5 stroke-[2.5]" />
             </div>
 
-            <h3 className="text-base font-semibold text-neutral-100 mb-1">
-              Payment submitted
+            <h3
+              id="donation-dialog-title"
+              className="text-lg font-semibold text-neutral-100 mb-1"
+            >
+              Payment details submitted
             </h3>
 
             <p className="text-xs text-neutral-400 leading-relaxed mb-4">
@@ -112,7 +177,8 @@ export const DonationModal: React.FC<DonationModalProps> = ({
             <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/80 text-left text-[11px] text-neutral-500 font-mono mb-4">
               Reference: <span className="text-neutral-300">{reference}</span>
               <br />
-              Status: <span className="text-blue-400">pending admin review</span>
+              Status:{" "}
+              <span className="text-blue-400">pending admin review</span>
               <br />
               Reference numbers are kept private and never shown publicly.
             </div>
@@ -128,11 +194,14 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           /* Form */
           <div>
             <div className="mb-4">
-              <h3 className="text-base font-semibold text-neutral-100">
-                Submit Payment for Verification
+              <h3
+                id="donation-dialog-title"
+                className="text-lg font-semibold text-neutral-100"
+              >
+                Submit your payment details
               </h3>
               <p className="text-xs text-neutral-400 mt-0.5">
-                Verify your contribution on the public funding tracker.
+                Submit transaction details for payment verification.
               </p>
             </div>
 
@@ -145,18 +214,20 @@ export const DonationModal: React.FC<DonationModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
               {/* Method Toggle */}
               <div>
-                <label className="block text-neutral-400 mb-1">Payment Method</label>
+                <label className="block text-neutral-400 mb-1">
+                  Payment method
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => {
-                      setPaymentMethod('upi');
-                      setCurrency('INR');
+                      setPaymentMethod("upi");
+                      setCurrency("INR");
                     }}
                     className={`py-2 px-3 rounded-lg border text-center font-mono transition-colors ${
-                      paymentMethod === 'upi'
-                        ? 'bg-neutral-800 border-neutral-600 text-white'
-                        : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+                      paymentMethod === "upi"
+                        ? "bg-neutral-800 border-neutral-600 text-white"
+                        : "bg-neutral-950 border-neutral-800 text-neutral-400"
                     }`}
                   >
                     UPI
@@ -164,13 +235,13 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      setPaymentMethod('international');
-                      if (currency === 'INR') setCurrency('USD');
+                      setPaymentMethod("international");
+                      if (currency === "INR") setCurrency("USD");
                     }}
                     className={`py-2 px-3 rounded-lg border text-center font-mono transition-colors ${
-                      paymentMethod === 'international'
-                        ? 'bg-neutral-800 border-neutral-600 text-white'
-                        : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+                      paymentMethod === "international"
+                        ? "bg-neutral-800 border-neutral-600 text-white"
+                        : "bg-neutral-950 border-neutral-800 text-neutral-400"
                     }`}
                   >
                     International
@@ -181,8 +252,11 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               {/* Amount and Currency */}
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <label htmlFor="amount" className="block text-neutral-400 mb-1">
-                    Amount Paid *
+                  <label
+                    htmlFor="amount"
+                    className="block text-neutral-400 mb-1"
+                  >
+                    Amount paid *
                   </label>
                   <input
                     id="amount"
@@ -198,9 +272,15 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="currency" className="block text-neutral-400 mb-1">Currency</label>
+                  <label
+                    htmlFor="currency"
+                    className="block text-neutral-400 mb-1"
+                  >
+                    Currency
+                  </label>
                   <select
                     id="currency"
+                    disabled={paymentMethod === "upi"}
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-2 text-neutral-100 focus:outline-none focus:border-neutral-600 font-mono"
@@ -216,14 +296,25 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
               {/* Reference */}
               <div>
-                <label htmlFor="reference" className="block text-neutral-400 mb-1">
-                  {paymentMethod === 'upi' ? 'UPI UTR / 12-digit Ref No.' : 'Transaction / Reference ID'} *
+                <label
+                  htmlFor="reference"
+                  className="block text-neutral-400 mb-1"
+                >
+                  {paymentMethod === "upi"
+                    ? "UPI transaction reference (UTR)"
+                    : "Transaction / Reference ID"}{" "}
+                  *
                 </label>
                 <input
                   id="reference"
+                  maxLength={200}
                   type="text"
                   required
-                  placeholder={paymentMethod === 'upi' ? 'e.g. 402918274619' : 'e.g. tx_01HJ8Z...'}
+                  placeholder={
+                    paymentMethod === "upi"
+                      ? "e.g. 402918274619"
+                      : "e.g. tx_01HJ8Z..."
+                  }
                   value={reference}
                   onChange={(e) => setReference(e.target.value)}
                   className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 font-mono"
@@ -235,11 +326,16 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
               {/* Display Name */}
               <div>
-                <label htmlFor="displayName" className="block text-neutral-400 mb-1">
-                  Display Name <span className="text-neutral-600">(optional)</span>
+                <label
+                  htmlFor="displayName"
+                  className="block text-neutral-400 mb-1"
+                >
+                  Display name{" "}
+                  <span className="text-neutral-600">(optional)</span>
                 </label>
                 <input
                   id="displayName"
+                  maxLength={100}
                   type="text"
                   placeholder="e.g. Kazu"
                   value={displayName}
@@ -257,18 +353,25 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                   onChange={(e) => setShowName(e.target.checked)}
                   className="w-3.5 h-3.5 rounded bg-neutral-950 border-neutral-800 text-blue-600 focus:ring-0 focus:outline-none"
                 />
-                <label htmlFor="showName" className="text-neutral-300 select-none cursor-pointer">
-                  Show my name publicly on the verified backers list
+                <label
+                  htmlFor="showName"
+                  className="text-neutral-300 select-none cursor-pointer"
+                >
+                  Show my name on the public contribution list
                 </label>
               </div>
 
               {/* Message */}
               <div>
-                <label htmlFor="message" className="block text-neutral-400 mb-1">
-                  Optional note / message
+                <label
+                  htmlFor="message"
+                  className="block text-neutral-400 mb-1"
+                >
+                  Message (optional)
                 </label>
                 <input
                   id="message"
+                  maxLength={1000}
                   type="text"
                   placeholder="e.g. For kernel trees"
                   value={message}
@@ -282,7 +385,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 px-4 rounded-lg bg-[var(--accent)] hover:bg-[#d6e2ff] disabled:bg-neutral-800 text-xs font-mono font-medium text-[#131924] transition-colors flex items-center justify-center gap-1.5"
                 >
                   {isSubmitting ? (
                     <>

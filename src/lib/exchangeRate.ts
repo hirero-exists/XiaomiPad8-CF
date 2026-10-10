@@ -1,6 +1,6 @@
-import { CAMPAIGN_CONFIG } from '../config';
+import { CAMPAIGN_CONFIG } from "../config";
 
-const CACHE_KEY = 'xiaomi_pad_8_fx_rates';
+const CACHE_KEY = "xiaomi_pad_8_fx_rates";
 const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
 interface FxRates {
@@ -14,7 +14,12 @@ interface FxRates {
   };
 }
 
-export async function getLiveRates(): Promise<{ INR: number; EUR: number; GBP: number; USD: number }> {
+export async function getLiveRates(): Promise<{
+  INR: number;
+  EUR: number;
+  GBP: number;
+  USD: number;
+}> {
   // Check local storage cache first
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -30,7 +35,9 @@ export async function getLiveRates(): Promise<{ INR: number; EUR: number; GBP: n
 
   // Fetch live rates
   try {
-    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const res = await fetch("https://open.er-api.com/v6/latest/USD", {
+      signal: AbortSignal.timeout(6000),
+    });
     if (res.ok) {
       const json = await res.json();
       if (json && json.rates && json.rates.INR) {
@@ -44,7 +51,7 @@ export async function getLiveRates(): Promise<{ INR: number; EUR: number; GBP: n
         try {
           localStorage.setItem(
             CACHE_KEY,
-            JSON.stringify({ timestamp: Date.now(), rates })
+            JSON.stringify({ timestamp: Date.now(), rates }),
           );
         } catch {
           // ignore cache write error
@@ -54,7 +61,10 @@ export async function getLiveRates(): Promise<{ INR: number; EUR: number; GBP: n
       }
     }
   } catch (err) {
-    console.warn('Failed to fetch live FX rates, falling back to default:', err);
+    console.warn(
+      "Failed to fetch live FX rates, falling back to default:",
+      err,
+    );
   }
 
   return {
@@ -73,30 +83,30 @@ export function calculateApprovalAmounts(
   nativeAmount: number,
   currency: string,
   fxUsdToInr: number,
-  rates?: { EUR: number; GBP: number }
+  rates?: { EUR: number; GBP: number },
 ): { usd_amount: number; inr_amount: number } {
-  const curr = (currency || 'INR').toUpperCase();
+  const curr = (currency || "INR").toUpperCase();
 
-  if (curr === 'USD') {
+  if (curr === "USD") {
     const usd = Math.round(nativeAmount * 100) / 100;
     const inr = Math.round(usd * fxUsdToInr);
     return { usd_amount: usd, inr_amount: inr };
   }
 
-  if (curr === 'INR') {
+  if (curr === "INR") {
     const inr = Math.round(nativeAmount);
     const usd = Math.round((inr / fxUsdToInr) * 100) / 100;
     return { usd_amount: usd, inr_amount: inr };
   }
 
-  if (curr === 'EUR') {
+  if (curr === "EUR") {
     const eurRate = rates?.EUR || 0.95; // EUR per 1 USD
     const usd = Math.round((nativeAmount / eurRate) * 100) / 100;
     const inr = Math.round(usd * fxUsdToInr);
     return { usd_amount: usd, inr_amount: inr };
   }
 
-  if (curr === 'GBP') {
+  if (curr === "GBP") {
     const gbpRate = rates?.GBP || 0.81; // GBP per 1 USD
     const usd = Math.round((nativeAmount / gbpRate) * 100) / 100;
     const inr = Math.round(usd * fxUsdToInr);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   LogOut,
   ArrowLeft,
@@ -11,18 +11,19 @@ import {
   HelpCircle,
   Loader2,
   RefreshCw,
-  Lock
-} from 'lucide-react';
-import { Donation, CampaignData } from '../lib/types';
+  Lock,
+} from "lucide-react";
+import { Donation, CampaignData } from "../lib/types";
 import {
   fetchAdminDonations,
   approveDonationAction,
   rejectDonationAction,
   updateCampaignSettings,
   supabase,
-  isSupabaseConfigured
-} from '../lib/supabase';
-import { getLiveRates } from '../lib/exchangeRate';
+  isSupabaseConfigured,
+} from "../lib/supabase";
+import { getLiveRates } from "../lib/exchangeRate";
+import { CAMPAIGN_CONFIG } from "../config";
 
 interface AdminDashboardProps {
   campaign: CampaignData;
@@ -35,9 +36,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   campaign,
   onRefreshCampaign,
   onLogout,
-  onBackToSite
+  onBackToSite,
 }) => {
-  const [activeTab, setActiveTab] = useState<'pending' | 'campaign' | 'history' | 'security' | 'setup'>('pending');
+  const [activeTab, setActiveTab] = useState<
+    "pending" | "campaign" | "history" | "security" | "setup"
+  >("pending");
 
   const [pendingList, setPendingList] = useState<Donation[]>([]);
   const [approvedList, setApprovedList] = useState<Donation[]>([]);
@@ -48,14 +51,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // FX Rate state
   const [currentFxRate, setCurrentFxRate] = useState<number>(86.8);
-  const [customRate, setCustomRate] = useState<string>('86.8');
+  const [customRate, setCustomRate] = useState<string>("86.8");
   const [copiedRef, setCopiedRef] = useState<string | null>(null);
 
   // Campaign Settings form state
-  const [campaignStatus, setCampaignStatus] = useState(campaign.campaign_status);
-  const [fundraisingEnabled, setFundraisingEnabled] = useState(campaign.fundraising_enabled);
-  const [purchaseStatus, setPurchaseStatus] = useState(campaign.purchase_status);
-  const [purchaseProofUrl, setPurchaseProofUrl] = useState(campaign.purchase_proof_url);
+  const [campaignStatus, setCampaignStatus] = useState(
+    campaign.campaign_status,
+  );
+  const [fundraisingEnabled, setFundraisingEnabled] = useState(
+    campaign.fundraising_enabled,
+  );
+  const [purchaseStatus, setPurchaseStatus] = useState(
+    campaign.purchase_status,
+  );
+  const [purchaseProofUrl, setPurchaseProofUrl] = useState(
+    campaign.purchase_proof_url,
+  );
   const [purchaseNotes, setPurchaseNotes] = useState(campaign.purchase_notes);
   const [upiId, setUpiId] = useState(campaign.upi_id);
   const [paymentUrl, setPaymentUrl] = useState(campaign.payment_url);
@@ -63,14 +74,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Security / Password update state
-  const [adminEmail, setAdminEmail] = useState('forpayment169@gmail.com');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [adminEmail, setAdminEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const [newEmail, setNewEmail] = useState('');
+  const [newEmail, setNewEmail] = useState("");
   const [updatingEmail, setUpdatingEmail] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -80,7 +91,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       const [donations, rates] = await Promise.all([
         fetchAdminDonations(),
-        getLiveRates()
+        getLiveRates(),
       ]);
       setPendingList(donations.pending);
       setApprovedList(donations.approved);
@@ -90,13 +101,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       // Get logged-in user email
       if (supabase && isSupabaseConfigured) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (user && user.email) {
           setAdminEmail(user.email);
         }
       }
     } catch (err) {
-      console.error('Error fetching admin data:', err);
+      console.error("Error fetching admin data:", err);
     } finally {
       setLoading(false);
     }
@@ -121,7 +134,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         await loadData();
         onRefreshCampaign();
       } else {
-        alert('Failed to approve donation: ' + res.error);
+        alert("Failed to approve donation: " + res.error);
       }
     } finally {
       setActionLoadingId(null);
@@ -129,7 +142,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleReject = async (id: string) => {
-    if (!window.confirm('Reject this submission?')) return;
+    if (!window.confirm("Reject this submission?")) return;
     setActionLoadingId(id);
     try {
       const res = await rejectDonationAction(id);
@@ -137,7 +150,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         await loadData();
         onRefreshCampaign();
       } else {
-        alert('Failed to reject donation: ' + res.error);
+        alert("Failed to reject donation: " + res.error);
       }
     } finally {
       setActionLoadingId(null);
@@ -165,7 +178,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         onRefreshCampaign();
         setTimeout(() => setSettingsSaved(false), 3000);
       } else {
-        alert('Failed to save settings: ' + res.error);
+        alert("Failed to save settings: " + res.error);
       }
     } finally {
       setSavingSettings(false);
@@ -178,12 +191,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setPasswordSuccess(null);
 
     if (newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters.');
+      setPasswordError("Password must be at least 6 characters.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match.');
+      setPasswordError("Passwords do not match.");
       return;
     }
 
@@ -191,10 +204,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
     try {
       if (!isSupabaseConfigured || !supabase) {
-        // Mock preview
-        setPasswordSuccess('Password updated successfully (preview mode).');
-        setNewPassword('');
-        setConfirmPassword('');
+        setPasswordError("Supabase configuration is required.");
         return;
       }
 
@@ -205,12 +215,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (error) {
         setPasswordError(error.message);
       } else {
-        setPasswordSuccess('Password updated successfully! Use your new password on next login.');
-        setNewPassword('');
-        setConfirmPassword('');
+        setPasswordSuccess(
+          "Password updated. Use the new password for your next sign-in.",
+        );
+        setNewPassword("");
+        setConfirmPassword("");
       }
     } catch {
-      setPasswordError('Failed to update password. Please try again.');
+      setPasswordError("Failed to update password. Please try again.");
     } finally {
       setUpdatingPassword(false);
     }
@@ -221,8 +233,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEmailError(null);
     setEmailSuccess(null);
 
-    if (!newEmail.trim() || !newEmail.includes('@')) {
-      setEmailError('Please enter a valid email address.');
+    if (!newEmail.trim() || !newEmail.includes("@")) {
+      setEmailError("Please enter a valid email address.");
       return;
     }
 
@@ -230,9 +242,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
     try {
       if (!isSupabaseConfigured || !supabase) {
-        setAdminEmail(newEmail.trim());
-        setEmailSuccess('Email updated successfully (preview mode).');
-        setNewEmail('');
+        setEmailError("Supabase configuration is required.");
         return;
       }
 
@@ -243,11 +253,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (error) {
         setEmailError(error.message);
       } else {
-        setEmailSuccess('Email update initiated. A confirmation link has been sent to your new email.');
-        setNewEmail('');
+        setEmailSuccess(
+          "Email update initiated. A confirmation link has been sent to your new email.",
+        );
+        setNewEmail("");
       }
     } catch {
-      setEmailError('Failed to update email. Please try again.');
+      setEmailError("Failed to update email. Please try again.");
     } finally {
       setUpdatingEmail(false);
     }
@@ -257,7 +269,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (supabase) {
       await supabase.auth.signOut();
     }
-    localStorage.removeItem('xiaomi_pad_8_mock_admin_session');
     onLogout();
   };
 
@@ -275,13 +286,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
           <div>
             <h1 className="text-base sm:text-lg font-bold text-neutral-100 flex items-center gap-2">
-              <span>Admin Dashboard</span>
+              <span>Administration</span>
               <span className="text-[11px] font-mono text-neutral-500 font-normal">
                 ({pendingList.length} pending)
               </span>
             </h1>
             <p className="text-xs text-neutral-500 font-mono">
-              Logged in as: <strong className="text-neutral-300">{adminEmail}</strong>
+              Logged in as:{" "}
+              <strong className="text-neutral-300">{adminEmail}</strong>
             </p>
           </div>
         </div>
@@ -292,14 +304,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
             title="Refresh"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+            />
           </button>
           <button
             onClick={handleLogoutClick}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-400 hover:text-red-400 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>sign out</span>
+            <span>Sign out</span>
           </button>
         </div>
       </div>
@@ -307,11 +321,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Navigation tabs */}
       <div className="flex items-center gap-2 mt-5 mb-5 overflow-x-auto pb-1 text-xs font-mono">
         <button
-          onClick={() => setActiveTab('pending')}
+          onClick={() => setActiveTab("pending")}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'pending'
-              ? 'bg-neutral-800 text-white'
-              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+            activeTab === "pending"
+              ? "bg-neutral-800 text-white"
+              : "bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800"
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
@@ -319,11 +333,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => setActiveTab('campaign')}
+          onClick={() => setActiveTab("campaign")}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'campaign'
-              ? 'bg-neutral-800 text-white'
-              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+            activeTab === "campaign"
+              ? "bg-neutral-800 text-white"
+              : "bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800"
           }`}
         >
           <Settings className="w-3.5 h-3.5" />
@@ -331,11 +345,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => setActiveTab('history')}
+          onClick={() => setActiveTab("history")}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'history'
-              ? 'bg-neutral-800 text-white'
-              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+            activeTab === "history"
+              ? "bg-neutral-800 text-white"
+              : "bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800"
           }`}
         >
           <History className="w-3.5 h-3.5" />
@@ -343,11 +357,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => setActiveTab('security')}
+          onClick={() => setActiveTab("security")}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'security'
-              ? 'bg-neutral-800 text-white'
-              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+            activeTab === "security"
+              ? "bg-neutral-800 text-white"
+              : "bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800"
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
@@ -355,11 +369,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => setActiveTab('setup')}
+          onClick={() => setActiveTab("setup")}
           className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0 ${
-            activeTab === 'setup'
-              ? 'bg-neutral-800 text-white'
-              : 'bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800'
+            activeTab === "setup"
+              ? "bg-neutral-800 text-white"
+              : "bg-neutral-950 text-neutral-500 hover:text-neutral-300 border border-neutral-800"
           }`}
         >
           <HelpCircle className="w-3.5 h-3.5" />
@@ -370,15 +384,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ========================================================= */}
       {/* PENDING TAB                                               */}
       {/* ========================================================= */}
-      {activeTab === 'pending' && (
+      {activeTab === "pending" && (
         <div className="space-y-4">
           {/* Rate Controller */}
           <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
-            <span className="text-neutral-400">
-              Lock Rate at Approval:
-            </span>
+            <span className="text-neutral-400">Lock Rate at Approval:</span>
             <div className="flex items-center gap-2">
-              <label htmlFor="customRate" className="text-neutral-500">1 USD = ₹</label>
+              <label htmlFor="customRate" className="text-neutral-500">
+                1 USD = ₹
+              </label>
               <input
                 id="customRate"
                 type="number"
@@ -387,7 +401,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onChange={(e) => setCustomRate(e.target.value)}
                 className="w-20 bg-neutral-950 border border-neutral-700 rounded px-2 py-0.5 text-white font-mono text-xs focus:outline-none"
               />
-              <span className="text-neutral-600 text-[11px]">(Live: {currentFxRate.toFixed(2)})</span>
+              <span className="text-neutral-600 text-[11px]">
+                (Live: {currentFxRate.toFixed(2)})
+              </span>
             </div>
           </div>
 
@@ -403,17 +419,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ) : (
             <div className="space-y-3">
               {pendingList.map((item) => {
-                const isUpi = item.payment_method === 'upi';
+                const isUpi = item.payment_method === "upi";
                 const rateNum = parseFloat(customRate) || currentFxRate;
-                
+
                 // USD is main everywhere; bracketed native/INR
-                const usdEst = item.native_currency === 'INR'
-                  ? (item.native_amount / rateNum).toFixed(2)
-                  : item.native_amount;
-                
-                const bracketText = item.native_currency === 'INR'
-                  ? `(₹${item.native_amount.toLocaleString('en-IN')})`
-                  : `(≈ ₹${Math.round(item.native_amount * rateNum).toLocaleString('en-IN')})`;
+                const usdEst =
+                  item.native_currency === "INR"
+                    ? (item.native_amount / rateNum).toFixed(2)
+                    : item.native_amount;
+
+                const bracketText =
+                  item.native_currency === "INR"
+                    ? `(₹${item.native_amount.toLocaleString("en-IN")})`
+                    : `(≈ ₹${Math.round(item.native_amount * rateNum).toLocaleString("en-IN")})`;
 
                 return (
                   <div
@@ -424,7 +442,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-neutral-800 text-neutral-400">
-                            {isUpi ? 'UPI' : 'Card'}
+                            {isUpi ? "UPI" : "Card"}
                           </span>
                           <span className="text-sm font-bold font-mono text-neutral-100">
                             ${usdEst}
@@ -436,7 +454,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                         {/* Reference / UTR */}
                         <div className="flex items-center gap-1.5 text-xs font-mono bg-neutral-950 px-2.5 py-1 rounded border border-neutral-800/80 max-w-fit">
-                          <span className="text-neutral-500 uppercase text-[10px]">Ref:</span>
+                          <span className="text-neutral-500 uppercase text-[10px]">
+                            Ref:
+                          </span>
                           <span className="text-neutral-200 font-semibold select-all">
                             {item.payment_reference}
                           </span>
@@ -455,9 +475,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </div>
 
                         <div className="text-[11px] text-neutral-400 font-mono">
-                          Backer: <strong className="text-neutral-200">{item.display_name || 'Anonymous'}</strong>
-                          {!item.show_name && <span className="text-neutral-600 ml-1">(Requested anon)</span>}
-                          <span className="text-neutral-600 ml-2">• {new Date(item.created_at).toLocaleString()}</span>
+                          Backer:{" "}
+                          <strong className="text-neutral-200">
+                            {item.display_name || "Anonymous"}
+                          </strong>
+                          {!item.show_name && (
+                            <span className="text-neutral-600 ml-1">
+                              (Requested anon)
+                            </span>
+                          )}
+                          <span className="text-neutral-600 ml-2">
+                            • {new Date(item.created_at).toLocaleString()}
+                          </span>
                         </div>
 
                         {item.message && (
@@ -487,6 +516,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleReject(item.id)}
+                          aria-label={`Reject payment from ${item.display_name || "Anonymous"}`}
                           className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-mono text-neutral-400 hover:text-red-400 transition-colors"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -504,9 +534,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ========================================================= */}
       {/* CAMPAIGN SETTINGS TAB                                     */}
       {/* ========================================================= */}
-      {activeTab === 'campaign' && (
+      {activeTab === "campaign" && (
         <div className="max-w-xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-neutral-200 mb-4">Campaign Lifecycle</h2>
+          <h2 className="text-sm font-semibold text-neutral-200 mb-4">
+            Campaign Lifecycle
+          </h2>
 
           {settingsSaved && (
             <div className="mb-4 p-2 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono text-emerald-300">
@@ -516,14 +548,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <form onSubmit={handleSaveSettings} className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">Campaign Status</label>
+              <p className="font-medium text-neutral-200">
+                Community goal: ${CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD}
+              </p>
+              <p className="text-neutral-400 mt-1.5 leading-relaxed">
+                The goal is defined in the project configuration. Saving these
+                settings does not change the database's legacy goal value.
+              </p>
+            </div>
+            <div>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                Campaign Status
+              </label>
               <select
                 value={campaignStatus}
                 onChange={(e) => setCampaignStatus(e.target.value as any)}
                 className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-200 font-mono focus:outline-none"
               >
                 <option value="fundraising">fundraising (active)</option>
-                <option value="goal_reached">goal_reached (donations paused)</option>
+                <option value="goal_reached">
+                  goal_reached (donations paused)
+                </option>
                 <option value="completed">completed (hardware received)</option>
                 <option value="refunds">refunds (processing refunds)</option>
               </select>
@@ -540,7 +585,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">Hardware Procurement Status</label>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                Hardware Procurement Status
+              </label>
               <select
                 value={purchaseStatus}
                 onChange={(e) => setPurchaseStatus(e.target.value as any)}
@@ -548,12 +595,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               >
                 <option value="pending">pending (not yet ordered)</option>
                 <option value="ordered">ordered (awaiting delivery)</option>
-                <option value="received">received (in hands for development)</option>
+                <option value="received">
+                  received (in hands for development)
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">Purchase Proof / Receipt URL</label>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                Purchase Proof / Receipt URL
+              </label>
               <input
                 type="url"
                 value={purchaseProofUrl}
@@ -564,7 +615,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">Dev Hardware Notes</label>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                Dev Hardware Notes
+              </label>
               <textarea
                 rows={2}
                 value={purchaseNotes}
@@ -575,7 +628,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">UPI ID</label>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                UPI ID
+              </label>
               <input
                 type="text"
                 value={upiId}
@@ -585,7 +640,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div>
-              <label className="block text-neutral-400 mb-1 font-mono">International Payment URL (ThankYouVeryMuch)</label>
+              <label className="block text-neutral-400 mb-1 font-mono">
+                International Payment URL (ThankYouVeryMuch)
+              </label>
               <input
                 type="url"
                 value={paymentUrl}
@@ -599,7 +656,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               disabled={savingSettings}
               className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-mono font-medium text-white transition-colors"
             >
-              {savingSettings ? 'Saving...' : 'Save Settings'}
+              {savingSettings ? "Saving..." : "Save Settings"}
             </button>
           </form>
         </div>
@@ -608,7 +665,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ========================================================= */}
       {/* HISTORY TAB                                               */}
       {/* ========================================================= */}
-      {activeTab === 'history' && (
+      {activeTab === "history" && (
         <div className="space-y-2">
           {approvedList.map((item) => (
             <div
@@ -618,17 +675,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-emerald-400">✓ approved</span>
-                  <span className="text-neutral-200 font-semibold">{item.display_name}</span>
-                  <span className="text-neutral-600">Ref: {item.payment_reference}</span>
+                  <span className="text-neutral-200 font-semibold">
+                    {item.display_name}
+                  </span>
+                  <span className="text-neutral-600">
+                    Ref: {item.payment_reference}
+                  </span>
                 </div>
                 <div className="text-[11px] text-neutral-500 mt-0.5">
-                  Locked rate: 1 USD = ₹{item.fx_rate?.toFixed(2) || 'N/A'} • {item.approved_at ? new Date(item.approved_at).toLocaleDateString() : ''}
+                  Locked rate: 1 USD = ₹{item.fx_rate?.toFixed(2) || "N/A"} •{" "}
+                  {item.approved_at
+                    ? new Date(item.approved_at).toLocaleDateString()
+                    : ""}
                 </div>
               </div>
 
               <div className="text-right sm:shrink-0 font-mono">
-                <span className="text-neutral-100 font-semibold">${item.usd_amount}</span>
-                <span className="text-neutral-500 ml-1.5">(≈ ₹{item.inr_amount})</span>
+                <span className="text-neutral-100 font-semibold">
+                  ${item.usd_amount}
+                </span>
+                <span className="text-neutral-500 ml-1.5">
+                  (≈ ₹{item.inr_amount})
+                </span>
               </div>
             </div>
           ))}
@@ -641,9 +709,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div>
                 <span className="text-red-400 mr-1.5">✕ rejected</span>
                 <span className="text-neutral-400">{item.display_name}</span>
-                <span className="text-neutral-600 ml-2">Ref: {item.payment_reference}</span>
+                <span className="text-neutral-600 ml-2">
+                  Ref: {item.payment_reference}
+                </span>
               </div>
-              <span className="text-neutral-500">{item.native_currency} {item.native_amount}</span>
+              <span className="text-neutral-500">
+                {item.native_currency} {item.native_amount}
+              </span>
             </div>
           ))}
 
@@ -658,7 +730,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ========================================================= */}
       {/* SECURITY / ACCOUNT MANAGEMENT TAB                         */}
       {/* ========================================================= */}
-      {activeTab === 'security' && (
+      {activeTab === "security" && (
         <div className="max-w-xl space-y-6">
           {/* Change Password Card */}
           <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5">
@@ -667,7 +739,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <span>Change Admin Password</span>
             </h2>
             <p className="text-xs text-[var(--muted)] mb-4">
-              Update your password. Takes effect immediately for your Supabase account.
+              Update your password. Takes effect immediately for your Supabase
+              account.
             </p>
 
             {passwordSuccess && (
@@ -682,9 +755,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             )}
 
-            <form onSubmit={handlePasswordUpdate} className="space-y-3.5 text-xs font-mono">
+            <form
+              onSubmit={handlePasswordUpdate}
+              className="space-y-3.5 text-xs font-mono"
+            >
               <div>
-                <label className="block text-neutral-400 mb-1">New Password</label>
+                <label className="block text-neutral-400 mb-1">
+                  New Password
+                </label>
                 <input
                   type="password"
                   required
@@ -696,7 +774,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1">Confirm New Password</label>
+                <label className="block text-neutral-400 mb-1">
+                  Confirm New Password
+                </label>
                 <input
                   type="password"
                   required
@@ -712,7 +792,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 disabled={updatingPassword}
                 className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-xs font-medium text-white transition-colors"
               >
-                {updatingPassword ? 'Updating Password...' : 'Update Password'}
+                {updatingPassword ? "Updating Password..." : "Update Password"}
               </button>
             </form>
           </div>
@@ -723,7 +803,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               Change Admin Email
             </h2>
             <p className="text-xs text-[var(--muted)] mb-4">
-              Current email: <strong className="text-neutral-200">{adminEmail}</strong>
+              Current email:{" "}
+              <strong className="text-neutral-200">{adminEmail}</strong>
             </p>
 
             {emailSuccess && (
@@ -738,9 +819,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleEmailUpdate} className="space-y-3.5 text-xs font-mono">
+            <form
+              onSubmit={handleEmailUpdate}
+              className="space-y-3.5 text-xs font-mono"
+            >
               <div>
-                <label className="block text-neutral-400 mb-1">New Email Address</label>
+                <label className="block text-neutral-400 mb-1">
+                  New Email Address
+                </label>
                 <input
                   type="email"
                   required
@@ -756,7 +842,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 disabled={updatingEmail}
                 className="w-full py-2 px-4 rounded-lg border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-900 text-xs font-medium text-neutral-200 transition-colors"
               >
-                {updatingEmail ? 'Updating Email...' : 'Update Email'}
+                {updatingEmail ? "Updating Email..." : "Update Email"}
               </button>
             </form>
           </div>
@@ -766,42 +852,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ========================================================= */}
       {/* HOSTING GUIDE TAB                                         */}
       {/* ========================================================= */}
-      {activeTab === 'setup' && (
-        <div className="max-w-2xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 text-xs text-neutral-300 space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-100">Hosting on GitHub Pages (Free)</h2>
-
-          <div className="space-y-3">
-            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">1. Push to GitHub</strong>
-              <p className="text-neutral-400">
-                Create a new repository on GitHub (e.g. <code className="text-neutral-200">xiaomi-pad-8-crowdfunding</code>) and push this folder:
-                <br /><code className="text-neutral-200 select-all block mt-1 bg-neutral-900 p-1.5 rounded">git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git && git push -u origin main</code>
-              </p>
-            </div>
-
-            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">2. Enable GitHub Pages</strong>
-              <p className="text-neutral-400">
-                In your GitHub repo: Go to <strong>Settings</strong> &gt; <strong>Pages</strong>. Under <strong>Build and deployment &gt; Source</strong>, choose <strong>GitHub Actions</strong>.
-              </p>
-            </div>
-
-            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">3. Add Supabase Secrets to GitHub</strong>
-              <p className="text-neutral-400">
-                In GitHub: Go to <strong>Settings</strong> &gt; <strong>Secrets and variables</strong> &gt; <strong>Actions</strong> &gt; <strong>New repository secret</strong>:
-                <br />• <code className="text-neutral-200">VITE_SUPABASE_URL</code>: your Supabase Project URL
-                <br />• <code className="text-neutral-200">VITE_SUPABASE_ANON_KEY</code>: your Supabase anon public key
-              </p>
-            </div>
-
-            <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800">
-              <strong className="text-neutral-100 block mb-1">4. Automatic Deployment</strong>
-              <p className="text-neutral-400">
-                GitHub Actions will automatically run the build and publish your website to <code className="text-neutral-200">https://YOUR_USER.github.io/YOUR_REPO/</code>!
-              </p>
-            </div>
-          </div>
+      {activeTab === "setup" && (
+        <div className="max-w-2xl bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 text-sm text-neutral-300 space-y-4">
+          <h2 className="font-semibold text-neutral-100">
+            Deployment configuration
+          </h2>
+          <p className="text-neutral-400 leading-relaxed">
+            GitHub Actions publishes updates from the main branch to GitHub
+            Pages. Deployment status is available in the repository's Actions
+            tab.
+          </p>
+          <a
+            href="https://github.com/hirero-exists/XiaomiPad8-CF/actions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-link"
+          >
+            View deployment status
+          </a>
+          <p className="text-neutral-400 leading-relaxed">
+            Repository Actions secrets must contain the existing project's
+            VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY. Use the public anon
+            key.
+          </p>
+          <p className="text-neutral-400 leading-relaxed">
+            Database migrations are applied separately in Supabase SQL Editor.
+            Refer to the database documentation before changing access rules.
+          </p>
         </div>
       )}
     </div>

@@ -1,128 +1,92 @@
-import React from 'react';
-import { CampaignData } from '../lib/types';
-import { CAMPAIGN_CONFIG } from '../config';
-import { CheckCircle2, ShieldCheck, Cpu } from 'lucide-react';
+import React from "react";
+import { ArrowUpRight } from "lucide-react";
+import { CampaignData } from "../lib/types";
+import { CAMPAIGN_CONFIG } from "../config";
+import { formatUsd, formatInr } from "../lib/funding";
 
 interface DevicePurchasedProps {
   campaign: CampaignData;
-  fxRate: number;
 }
 
-export const DevicePurchased: React.FC<DevicePurchasedProps> = ({ campaign, fxRate }) => {
-  const communityGoalUsd = campaign.usd_goal || CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
-  const communityGoalInr = Math.round(communityGoalUsd * fxRate);
-
+export const DevicePurchased: React.FC<DevicePurchasedProps> = ({
+  campaign,
+}) => {
+  const goal = CAMPAIGN_CONFIG.COMMUNITY_GOAL_USD;
+  const developerShare = CAMPAIGN_CONFIG.DEV_COVERED_USD;
+  const status =
+    campaign.purchase_status === "received"
+      ? "Hardware received"
+      : campaign.purchase_status === "ordered"
+        ? "Hardware ordered"
+        : "Purchase after the goal is reached";
   return (
-    <section className="border-b border-[var(--line)]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-4">
-            <div className="font-mono text-xs text-[var(--muted)] mb-2">
-              03 // HARDWARE ALLOCATION
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-100">
-              Hardware tiers & developer guarantee.
-            </h2>
-            <p className="mt-2 text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-              Target device: {CAMPAIGN_CONFIG.DEVICE_NAME} ({CAMPAIGN_CONFIG.DEVICE_SPECS}).
-            </p>
+    <section className="site-container section-spacing section-divider budget-layout">
+      <div className="section-heading">
+        <p className="eyebrow">Where the money goes</p>
+        <h2>Hardware budget</h2>
+        <p className="muted">
+          Contributions fund part of the tablet. The developer pays the
+          remaining balance, the entire pen cost, shipping, taxes, and customs.
+        </p>
+        <p className="budget-status">{status}</p>
+        {campaign.purchase_proof_url && (
+          <a
+            className="text-link mt-3"
+            href={campaign.purchase_proof_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View purchase receipt
+            <ArrowUpRight size={15} />
+          </a>
+        )}
+        {campaign.purchase_notes && (
+          <p className="muted text-sm mt-3 break-words">
+            {campaign.purchase_notes}
+          </p>
+        )}
+      </div>
+      <div className="budget-breakdown">
+        <dl>
+          <div>
+            <dt>
+              {CAMPAIGN_CONFIG.TABLET_NAME}
+              <span>Base tablet</span>
+            </dt>
+            <dd>
+              ≈ {formatUsd(CAMPAIGN_CONFIG.TABLET_PRICE_USD)}
+              <span>≈ {formatInr(CAMPAIGN_CONFIG.TABLET_PRICE_INR)}</span>
+            </dd>
           </div>
-
-          <div className="md:col-span-8 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Total Package */}
-              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
-                <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] mb-1">
-                  <Cpu className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Total Hardware Package</span>
-                </div>
-                <div className="font-mono mt-1">
-                  <span className="text-base sm:text-lg font-bold text-neutral-100">~${CAMPAIGN_CONFIG.TOTAL_PACKAGE_USD}</span>
-                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{CAMPAIGN_CONFIG.TOTAL_PACKAGE_INR.toLocaleString('en-IN')})</span>
-                </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">Pad 8 (~$400) + Pen Pro (~$65)</span>
-              </div>
-
-              {/* Community Goal */}
-              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
-                <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-blue-400 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Community Target</span>
-                </div>
-                <div className="font-mono mt-1">
-                  <span className="text-xl font-bold text-neutral-100">${communityGoalUsd}</span>
-                  <span className="text-xs text-[var(--muted)] block">(≈ ₹{communityGoalInr.toLocaleString('en-IN')})</span>
-                </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">Single community goal</span>
-              </div>
-
-              {/* Developer Guarantee */}
-              <div className="p-4 rounded-lg bg-neutral-900/60 border border-[var(--line)]">
-                <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-emerald-400 mb-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Developer Co-Funding</span>
-                </div>
-                <div className="font-mono mt-1">
-                  <span className="text-base sm:text-lg font-bold text-neutral-100">~${CAMPAIGN_CONFIG.DEV_COVERED_USD}</span>
-                  <span className="text-xs text-emerald-400/90 block">(≈ ₹{CAMPAIGN_CONFIG.DEV_COVERED_INR.toLocaleString('en-IN')})</span>
-                </div>
-                <span className="text-[11px] text-[var(--muted)] block mt-2">Dev covers pen + rest</span>
-              </div>
-            </div>
-
-            {/* Note explaining the variants and the developer promise */}
-            <div className="text-xs sm:text-sm text-neutral-300 leading-relaxed bg-neutral-900/40 p-5 rounded-lg border border-[var(--line)] space-y-4">
-              <div>
-                <span className="font-mono text-[10px] text-blue-400 uppercase tracking-wider block mb-1">HARDWARE ALLOCATION & CO-FUNDING</span>
-                <p className="font-semibold text-neutral-100 text-sm">
-                  Complete Device Package: Tablet + Official Stylus
-                </p>
-                <p className="text-neutral-400 text-xs mt-1">
-                  The goal is strictly capped at $260 (≈ ₹25,000). The developer personally covers all remaining costs out-of-pocket:
-                </p>
-              </div>
-
-              <div className="space-y-3 font-mono text-xs">
-                {/* Tablet Allocation */}
-                <div className="p-3.5 rounded bg-neutral-950/80 border border-[var(--line)]">
-                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-blue-400 font-bold">01 // Xiaomi Pad 8 (Base Variant)</span>
-                    <span className="text-[11px] text-neutral-400">Retail: ~$400 (≈ ₹38,000)</span>
-                  </div>
-                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    The base Xiaomi Pad 8 tablet retails for <strong>~$400 (≈ ₹38,000)</strong>. The community is only asked to contribute <strong>$260 (≈ ₹25,000)</strong>. The developer will personally cover the remaining <strong>~$140 (≈ ₹13,000)</strong> out-of-pocket.
-                  </p>
-                </div>
-
-                {/* Pen Allocation */}
-                <div className="p-3.5 rounded bg-neutral-950/80 border border-emerald-500/30 bg-emerald-950/10">
-                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-emerald-400 font-bold">02 // Xiaomi Focus Pen Pro</span>
-                    <span className="text-[11px] text-emerald-400 font-semibold">Retail: ~$65 (≈ ₹6,000) • 100% DEV COVERED</span>
-                  </div>
-                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    The official <strong>Xiaomi Focus Pen Pro</strong> retails online for approximately <strong>₹5,499 - ₹5,999 (~$65 USD)</strong> (featuring 16,384 levels of pressure sensitivity, active haptics, and &lt;1ms low-latency). <strong>The developer is covering 100% of the stylus cost personally</strong> ($0 from community funds) to ensure stylus HAL and palm-rejection can be fully tested on custom ROMs.
-                  </p>
-                </div>
-
-                {/* Final Total Summary */}
-                <div className="p-3.5 rounded bg-neutral-950/80 border border-blue-500/30">
-                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
-                    <span className="text-neutral-200 font-bold">03 // Total Hardware Cost & Dev Commitment</span>
-                    <span className="text-[11px] text-blue-400 font-semibold">Total: ~$465 (≈ ₹44,000)</span>
-                  </div>
-                  <p className="text-neutral-300 font-sans text-xs leading-relaxed">
-                    Total cost of the tablet and pen comes to <strong>~$465 (≈ ₹44,000)</strong>. The community funds <strong>$260 (≈ ₹25,000)</strong>, and the developer personally pays the remaining <strong>~$205 (≈ ₹19,000)</strong> balance plus all local import taxes, customs duties, and shipping fees.
-                  </p>
-                </div>
-              </div>
-
-              <p className="pt-3 border-t border-neutral-800 text-neutral-400 text-xs">
-                <strong>Developer guarantee:</strong> Once the $260 (≈ ₹25,000) community goal is reached, the developer covers the rest personally and orders the hardware immediately to commence bring-up.
-              </p>
-            </div>
+          <div>
+            <dt>
+              {CAMPAIGN_CONFIG.PEN_NAME}
+              <span>Funded by the developer</span>
+            </dt>
+            <dd>
+              ≈ {formatUsd(CAMPAIGN_CONFIG.PEN_PRICE_USD)}
+              <span>≈ {formatInr(CAMPAIGN_CONFIG.PEN_PRICE_INR)}</span>
+            </dd>
+          </div>
+          <div className="budget-total">
+            <dt>Estimated hardware cost</dt>
+            <dd>≈ {formatUsd(CAMPAIGN_CONFIG.TOTAL_PACKAGE_USD)}</dd>
+          </div>
+        </dl>
+        <div className="cost-split">
+          <div>
+            <span className="muted text-sm">Community share</span>
+            <strong>{formatUsd(goal)}</strong>
+          </div>
+          <div>
+            <span className="muted text-sm">Developer share</span>
+            <strong>≈ {formatUsd(developerShare)}</strong>
           </div>
         </div>
+        <p className="muted text-xs mt-4 leading-relaxed">
+          Hardware prices are estimates. The developer covers shipping and
+          import costs in addition to the hardware balance.
+        </p>
       </div>
     </section>
   );

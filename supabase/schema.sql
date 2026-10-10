@@ -196,8 +196,7 @@ GRANT SELECT ON public.public_donations TO anon, authenticated;
 -- You can create your admin user directly in the Supabase Dashboard:
 -- 1. Go to "Authentication" -> "Users" on the left menu.
 -- 2. Click "Add user" -> "Create user".
--- 3. Email: forpayment169@gmail.com
---    Password: KAZUOAexists765!
+-- 3. Enter your admin email and a unique password. Never commit credentials.
 -- 4. Check "Auto Confirm User?" -> ON.
 -- 5. Click "Create user".
 --

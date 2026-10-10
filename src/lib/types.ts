@@ -1,7 +1,13 @@
-export type PaymentMethod = 'upi' | 'international';
-export type DonationStatus = 'pending' | 'approved' | 'rejected' | 'refunded';
-export type CampaignStatus = 'interest' | 'fundraising' | 'goal_reached' | 'refunds' | 'completed';
-export type PurchaseStatus = 'pending' | 'ordered' | 'received';
+export type PaymentMethod = "upi" | "international";
+export type DonationStatus = "pending" | "approved" | "rejected" | "refunded";
+export type CampaignStatus =
+  | "interest"
+  | "fundraising"
+  | "goal_reached"
+  | "refunds"
+  | "completed";
+export type PurchaseStatus = "pending" | "ordered" | "received";
+export type DataStatus = "loading" | "ready" | "unavailable";
 
 export interface Donation {
   id: string;

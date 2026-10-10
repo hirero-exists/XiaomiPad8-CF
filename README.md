@@ -1,175 +1,56 @@
-# Xiaomi Pad 8 Development Crowdfunding 🚀
+# Xiaomi Pad 8 Development Fund
 
-A clean, minimal, responsive, single-page community crowdfunding website for the **Xiaomi Pad 8** development device. Designed to feel like an authentic open-source project page rather than a commercial platform.
+React and TypeScript website for funding Xiaomi Pad 8 custom Android ROM development and hardware testing. The community goal is $260. The developer contributes approximately $205 toward the remaining tablet cost and the Focus Pen Pro, and covers shipping and import costs separately.
 
-Hosted for free on **GitHub Pages** with a serverless **Supabase** backend for private payment verification, admin authentication, and public totals with locked historical exchange rates.
+## Development
 
----
+Requires Node.js 22 or later. GitHub Actions uses Node.js 24.
 
-## 📸 Key Highlights & Features
-
-- **Minimalist & Clean UI**: Dark-neutral theme inspired by GitHub and open-source projects, with subtle blue accents matching the official tablet hardware.
-- **Main Funding Progress Bar**: Displays live progress towards the **$350 USD** community goal along with live Indian Rupee (INR) equivalents.
-- **Milestones**: ₹20,000, ₹25,000, ₹30,000, and $350 Final goal markers.
-- **Co-funding Transparency**: Transparent card showing the total device price (₹52,000 / ~$540), community goal ($350), and the developer's personal out-of-pocket contribution.
-- **Donation Methods**:
-  - **India**: UPI ID with 1-click copy, QR code preview, and verification submission.
-  - **International**: Card / payment gateway link (e.g. TYVM) with transaction verification submission.
-- **Strict Verification & Row-Level Security**:
-  - All submissions start as `pending`.
-  - Transaction references / UTR numbers are **never** exposed publicly.
-  - Public visitors can only view approved donations and totals.
-- **Permanent Exchange Rate Locking**:
-  - When an admin approves a donation, the USD/INR conversion rate at that exact moment is locked permanently into that record. Historical totals will never fluctuate when future exchange rates change.
-- **Protected Admin Dashboard (`/#/admin`)**:
-  - Requires email + password authentication powered by Supabase Auth.
-  - One-click Approve / Reject with live exchange rate preview.
-  - Campaign settings management (lifecycle state, purchase status, proof receipt link).
-
----
-
-## 🛠️ Tech Stack
-
-- **Frontend**: [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL with Row Level Security)
-- **Exchange Rates**: Open Exchange Rates API (free, automatic fallback)
-- **Deployment**: GitHub Pages via GitHub Actions
-
----
-
-## 🚀 Quick Start (Local Development)
-
-### 1. Clone or Open the Repository
 ```bash
-cd xiaomi-pad-8-crowdfunding
+npm ci
+cp .env.example .env
 ```
 
-### 2. Install Dependencies
-```bash
-npm install
-```
+Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env` to the existing project's URL and public anon key, then run:
 
-### 3. Start Development Server
 ```bash
 npm run dev
 ```
-Open your browser at `http://localhost:5173`.
 
-> **Note:** If you haven't set up Supabase credentials yet, the app automatically runs in **Preview Mode** with local demo data. You can log into `/admin` using any password to test all features immediately!
+The development server runs at `http://localhost:5173`. Administration is available at `/#/admin` and requires a valid Supabase account. Database permissions determine which accounts can review payments and edit campaign settings.
 
----
+Without Supabase configuration, campaign data and payment services are unavailable. The application does not create substitute records or allow local administrator sign-in.
 
-## 🗄️ Setting Up the Backend (In Simple Terms)
+### Read-only design preview
 
-You do **not** need to manage a server or pay for hosting. Supabase gives you a free database and authentication system.
-
-### Step 1: Create a Free Supabase Project
-1. Go to [supabase.com](https://supabase.com) and click **"Start your project"** (log in with your GitHub account).
-2. Click **"New Project"**.
-3. Choose a project name (e.g., `xiaomi-pad-8`), set any strong database password, and pick a region close to you.
-4. Click **"Create new project"** and wait about 1–2 minutes for it to initialize.
-
-### Step 2: Run the Database Setup Script
-1. In your Supabase project dashboard, click on the **SQL Editor** tab (the `>_` icon on the left menu).
-2. Click **"New query"**.
-3. Open the file [`supabase/schema.sql`](supabase/schema.sql) in this repository, copy all of its contents, and paste them into the Supabase SQL editor.
-4. Click the green **"Run"** button.
-   *(This creates the tables, security policies, and views automatically).*
-
-### Step 3: Create Your Admin Password
-1. In the Supabase left menu, click **Authentication** &gt; **Users**.
-2. Click **"Add user"** &gt; **"Create user"**.
-3. Enter your admin email address and your chosen password.
-4. Toggle **"Auto Confirm User?"** to ON (so you don't need to verify via email).
-5. Click **"Create user"**.
-   *(You will use this email and password to log in at `/#/admin`).*
-
-### Step 4: Get Your API Keys
-1. In Supabase, click the **Settings** (gear icon) in the bottom-left &gt; **API**.
-2. Under **Project API keys**, you will see:
-   - **Project URL** (e.g., `https://abcdefghijk.supabase.co`)
-   - **anon / public key** (a long string starting with `ey...`)
-3. Copy these values into your `.env` file:
-   ```env
-   VITE_SUPABASE_URL=https://abcdefghijk.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJh......
-   ```
-
-That's it! Your backend is fully configured.
-
----
-
-## 🔐 Accessing the Admin Dashboard
-
-1. Navigate to:
-   ```
-   http://localhost:5173/#/admin
-   ```
-   (Or click the small **Admin** lock button in the top navbar or footer).
-2. Enter your admin email and password.
-3. Once logged in, you can:
-   - Review pending UPI and card submissions.
-   - Click **Approve** to lock the current USD/INR exchange rate and publish the backer to the live page.
-   - Click **Reject** to discard fraudulent or invalid submissions.
-   - Manage the campaign lifecycle (e.g. switch to *Goal Reached* or *Device Ordered* and add invoice receipts).
-
----
-
-## ⚙️ Customization & Configuration
-
-All campaign settings can be adjusted in one central file:
-[`src/config.ts`](src/config.ts)
-
-```ts
-export const CAMPAIGN_CONFIG = {
-  COMMUNITY_GOAL_USD: 350,
-  DEVICE_PRICE_INR: 52000,
-  DEVICE_NAME: "Xiaomi Pad 8",
-  DEVICE_SPECS: "12GB RAM + 256GB Storage + Xiaomi Pen",
-  UPI_ID: "yourname@upi",
-  INTERNATIONAL_PAYMENT_URL: "https://www.thankyouverymuch.co/xiaomipad8",
-  // ...
-};
-```
-
-You can also override `VITE_UPI_ID` and `VITE_INTERNATIONAL_PAYMENT_URL` directly in `.env`.
-
----
-
-## 🌐 Deploying to GitHub Pages for Free
-
-This repository includes a ready-to-use GitHub Actions deployment workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
-
-### 1. Push Code to GitHub
-Push your repository to GitHub:
 ```bash
-git init
-git add .
-git commit -m "Initial commit of Xiaomi Pad 8 crowdfunding website"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main
+npm run dev:preview
 ```
 
-### 2. Add Secrets to GitHub
-1. In your GitHub repository, go to **Settings** &gt; **Secrets and variables** &gt; **Actions**.
-2. Click **"New repository secret"** and add:
-   - `VITE_SUPABASE_URL`: Your Supabase Project URL
-   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon key
-   - (Optional) `VITE_UPI_ID`: Your UPI ID
+This explicitly selected development mode displays labeled sample contributions for layout review. It disables Supabase connections, payments, submissions, and administration. Sample records are held in memory and are never saved. Production builds cannot enable this mode.
 
-### 3. Enable GitHub Pages
-1. Go to **Settings** &gt; **Pages**.
-2. Under **Build and deployment** &gt; **Source**, select **GitHub Actions**.
-3. Push any commit to `main` (or click **Actions** &gt; **Deploy to GitHub Pages** &gt; **Run workflow**).
-4. Within 1 minute, your website will be live at:
-   `https://YOUR_USERNAME.github.io/YOUR_REPO/`
+## Data and access control
 
----
+Supabase PostgreSQL stores campaign settings and payment submissions. Progress is calculated from approved contributions. Money is transferred through UPI or ThankYouVeryMuch; the website records payment details for manual verification.
 
-## 📄 License & Transparency
+The public funding target is configured in `src/config.ts` as $260. Legacy goal values in the database are preserved and do not override this target.
 
-This project is open-source. Not affiliated with or endorsed by Xiaomi Inc.
-All contributions are collected transparently for open-source development hardware.
+See [Database documentation](supabase/README.md) for storage details and the separate access control migration for an existing project. Deploying the website does not apply SQL migrations.
+
+## Validation
+
+```bash
+npm run build
+npm run test:runtime
+npm run test:db
+```
+
+Runtime tests verify configuration and preview isolation. Database tests use a disposable PostgreSQL instance to verify access restrictions, public-field filtering, approval behavior, and preservation of existing records. Tests do not access the live database.
+
+## Deployment
+
+GitHub Actions deploys `main` and `master` to [GitHub Pages](https://hirero-exists.github.io/XiaomiPad8-CF/). Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in repository Actions secrets. Never expose a service-role key or account password in client code.
+
+Optional payment defaults use `VITE_UPI_ID` and `VITE_INTERNATIONAL_PAYMENT_URL`. Saved campaign settings take precedence. The UPI QR code and app link use the active UPI ID. The legacy `developer@upi` seed placeholder falls back to the configured payment address.
+
+This project is independent and is not affiliated with Xiaomi.
